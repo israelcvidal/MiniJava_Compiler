@@ -1,6 +1,8 @@
-package Assem;
+package core.instruction_selection.assem;
+
+import core.activation_records.temp.LabelList;
 
 public class Targets {
-  public Temp.LabelList labels;
-  public Targets(Temp.LabelList l) {labels=l;}
+  public LabelList labels;
+  public Targets(LabelList l) {labels=l;}
 }

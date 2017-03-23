@@ -1,4 +1,4 @@
-package Graph;
+package core.dataflow_analysis.graph;
 public class NodeList {
   public Node head;
   public NodeList tail;

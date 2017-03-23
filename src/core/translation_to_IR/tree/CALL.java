@@ -1,6 +1,5 @@
-package Tree;
-import Temp.Temp;
-import Temp.Label;
+package core.translation_to_IR.tree;
+
 public class CALL extends Exp {
   public Exp func;
   public ExpList args;

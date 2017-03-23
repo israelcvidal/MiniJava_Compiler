@@ -1,26 +1,32 @@
-package Assem;
+package core.instruction_selection.assem;
+
+import core.activation_records.temp.Temp;
+import core.activation_records.temp.TempList;
+import core.activation_records.temp.TempMap;
+import core.activation_records.temp.Label;
+import core.activation_records.temp.LabelList;
 
 public abstract class Instr {
   public String assem;
-  public abstract Temp.TempList use();
-  public abstract Temp.TempList def();
+  public abstract TempList use();
+  public abstract TempList def();
   public abstract Targets jumps();
 
-  private Temp.Temp nthTemp(Temp.TempList l, int i) {
+  private Temp nthTemp(TempList l, int i) {
     if (i==0) return l.head;
     else return nthTemp(l.tail,i-1);
   }
 
-  private Temp.Label nthLabel(Temp.LabelList l, int i) {
+  private Label nthLabel(LabelList l, int i) {
     if (i==0) return l.head;
     else return nthLabel(l.tail,i-1);
   }
 
-  public String format(Temp.TempMap m) {
-    Temp.TempList dst = def();
-    Temp.TempList src = use();
+  public String format(TempMap m) {
+    TempList dst = def();
+    TempList src = use();
     Targets j = jumps();
-    Temp.LabelList jump = (j==null)?null:j.labels;
+    LabelList jump = (j==null)?null:j.labels;
     StringBuffer s = new StringBuffer();
     int len = assem.length();
     for(int i=0; i<len; i++)

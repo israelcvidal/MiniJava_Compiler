@@ -1,9 +1,10 @@
-package Graph;
+package core.dataflow_analysis.graph;
 
 public class Node {
 
     Graph mygraph;
-    private Node(){}
+    @SuppressWarnings("unused")
+	private Node(){}
     int mykey;
     public Node(Graph g) {
 	mygraph=g; 

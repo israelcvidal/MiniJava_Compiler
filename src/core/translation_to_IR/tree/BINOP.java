@@ -1,6 +1,5 @@
-package Tree;
-import Temp.Temp;
-import Temp.Label;
+package core.translation_to_IR.tree;
+
 public class BINOP extends Exp {
   public int binop;
   public Exp left, right;

@@ -1,26 +1,36 @@
-package Canon;
+package core.instruction_selection.canon;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import core.activation_records.temp.Label;
+import core.translation_to_IR.tree.CJUMP;
+import core.translation_to_IR.tree.JUMP;
+import core.translation_to_IR.tree.LABEL;
+import core.translation_to_IR.tree.Stm;
+import core.translation_to_IR.tree.StmList;
 
 public class TraceSchedule {
 
-  public Tree.StmList stms;
+  public StmList stms;
   BasicBlocks theBlocks;
-  java.util.Dictionary table = new java.util.Hashtable();
+  Dictionary<Label, StmList> table = new Hashtable<>();
 
-  Tree.StmList getLast(Tree.StmList block) {
-     Tree.StmList l=block;
+  StmList getLast(StmList block) {
+     StmList l=block;
      while (l.tail.tail!=null)  l=l.tail;
      return l;
   }
 
-  void trace(Tree.StmList l) {
+  void trace(StmList l) {
    for(;;) {
-     Tree.LABEL lab = (Tree.LABEL)l.head;
+     LABEL lab = (LABEL)l.head;
      table.remove(lab.label);
-     Tree.StmList last = getLast(l);
-     Tree.Stm s = last.tail.head;
-     if (s instanceof Tree.JUMP) {
-	Tree.JUMP j = (Tree.JUMP)s;
-        Tree.StmList target = (Tree.StmList)table.get(j.targets.head);
+     StmList last = getLast(l);
+     Stm s = last.tail.head;
+     if (s instanceof JUMP) {
+	JUMP j = (JUMP)s;
+        StmList target = table.get(j.targets.head);
 	if (j.targets.tail==null && target!=null) {
                last.tail=target;
 	       l=target;
@@ -30,27 +40,27 @@ public class TraceSchedule {
 	  return;
         }
      }
-     else if (s instanceof Tree.CJUMP) {
-	Tree.CJUMP j = (Tree.CJUMP)s;
-        Tree.StmList t = (Tree.StmList)table.get(j.iftrue);
-        Tree.StmList f = (Tree.StmList)table.get(j.iffalse);
+     else if (s instanceof CJUMP) {
+	CJUMP j = (CJUMP)s;
+        StmList t = table.get(j.iftrue);
+        StmList f = table.get(j.iffalse);
         if (f!=null) {
 	  last.tail.tail=f; 
 	  l=f;
 	}
         else if (t!=null) {
-	  last.tail.head=new Tree.CJUMP(Tree.CJUMP.notRel(j.relop),
+	  last.tail.head=new CJUMP(CJUMP.notRel(j.relop),
 					j.left,j.right,
 					j.iffalse,j.iftrue);
 	  last.tail.tail=t;
 	  l=t;
         }
         else {
-	  Temp.Label ff = new Temp.Label();
-	  last.tail.head=new Tree.CJUMP(j.relop,j.left,j.right,
+	  Label ff = new Label();
+	  last.tail.head=new CJUMP(j.relop,j.left,j.right,
 					j.iftrue,ff);
-	  last.tail.tail=new Tree.StmList(new Tree.LABEL(ff),
-		           new Tree.StmList(new Tree.JUMP(j.iffalse),
+	  last.tail.tail=new StmList(new LABEL(ff),
+		           new StmList(new JUMP(j.iffalse),
 					    getNext()));
 	  return;
         }
@@ -59,12 +69,12 @@ public class TraceSchedule {
     }
   }
 
-  Tree.StmList getNext() {
+  StmList getNext() {
       if (theBlocks.blocks==null) 
-	return new Tree.StmList(new Tree.LABEL(theBlocks.done), null);
+	return new StmList(new LABEL(theBlocks.done), null);
       else {
-	 Tree.StmList s = theBlocks.blocks.head;
-	 Tree.LABEL lab = (Tree.LABEL)s.head;
+	 StmList s = theBlocks.blocks.head;
+	 LABEL lab = (LABEL)s.head;
 	 if (table.get(lab.label) != null) {
           trace(s);
 	  return s;
@@ -79,7 +89,7 @@ public class TraceSchedule {
   public TraceSchedule(BasicBlocks b) {
     theBlocks=b;
     for(StmListList l = b.blocks; l!=null; l=l.tail)
-       table.put(((Tree.LABEL)l.head.head).label, l.head);
+       table.put(((LABEL)l.head.head).label, l.head);
     stms=getNext();
     table=null;
   }        

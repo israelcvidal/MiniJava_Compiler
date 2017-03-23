@@ -1,6 +1,5 @@
-package Tree;
-import Temp.Temp;
-import Temp.Label;
+package core.translation_to_IR.tree;
+
 public class MEM extends Exp {
   public Exp exp;
   public MEM(Exp e) {exp=e;}

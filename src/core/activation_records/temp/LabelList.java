@@ -1,4 +1,4 @@
-package Temp;
+package core.activation_records.temp;
 
 public class LabelList {
    public Label head;

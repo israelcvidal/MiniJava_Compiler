@@ -3,10 +3,10 @@ package core.abstract_syntax.syntaxtree;
 import java.util.Vector;
 
 public class ClassDeclList {
-   private Vector list;
+   private Vector<ClassDecl> list;
 
    public ClassDeclList() {
-      list = new Vector();
+      list = new Vector<>();
    }
 
    public void addElement(ClassDecl n) {
@@ -14,7 +14,7 @@ public class ClassDeclList {
    }
 
    public ClassDecl elementAt(int i)  { 
-      return (ClassDecl)list.elementAt(i); 
+      return list.elementAt(i); 
    }
 
    public int size() { 

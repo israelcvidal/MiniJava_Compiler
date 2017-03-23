@@ -1,14 +1,17 @@
-package Assem;
+package core.instruction_selection.assem;
+
+import core.activation_records.temp.Temp;
+import core.activation_records.temp.TempList;
 
 public class MOVE extends Instr {
-   public Temp.Temp dst;   
-   public Temp.Temp src;
+   public Temp dst;   
+   public Temp src;
 
-   public MOVE(String a, Temp.Temp d, Temp.Temp s) {
+   public MOVE(String a, Temp d, Temp s) {
       assem=a; dst=d; src=s;
    }
-   public Temp.TempList use() {return new Temp.TempList(src,null);}
-   public Temp.TempList def() {return new Temp.TempList(dst,null);}
+   public TempList use() {return new TempList(src,null);}
+   public TempList def() {return new TempList(dst,null);}
    public Targets jumps()     {return null;}
 
 }

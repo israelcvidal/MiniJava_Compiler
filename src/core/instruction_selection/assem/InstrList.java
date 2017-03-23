@@ -1,4 +1,4 @@
-package Assem;
+package core.instruction_selection.assem;
 
 public class InstrList {
   public Instr head;

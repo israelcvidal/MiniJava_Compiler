@@ -1,4 +1,4 @@
-package Temp;
+package core.activation_records.temp;
 
-public interface TempMap {public String tempMap(Temp.Temp t);}
+public interface TempMap {public String tempMap(Temp t);}
 

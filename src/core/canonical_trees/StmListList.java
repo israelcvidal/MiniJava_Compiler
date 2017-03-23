@@ -1,8 +1,10 @@
-package Canon;
+package core.canonical_trees;
+
+import core.translation_to_IR.tree.StmList;
 
 public class StmListList {
-  public Tree.StmList head;
+  public StmList head;
   public StmListList tail;
-  public StmListList(Tree.StmList h, StmListList t) {head=h; tail=t;}
+  public StmListList(StmList h, StmListList t) {head=h; tail=t;}
 }
 

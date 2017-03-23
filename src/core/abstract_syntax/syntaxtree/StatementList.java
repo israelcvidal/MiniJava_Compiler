@@ -3,10 +3,10 @@ package core.abstract_syntax.syntaxtree;
 import java.util.Vector;
 
 public class StatementList {
-   private Vector list;
+   private Vector<Statement> list;
 
    public StatementList() {
-      list = new Vector();
+      list = new Vector<>();
    }
 
    public void addElement(Statement n) {
@@ -14,7 +14,7 @@ public class StatementList {
    }
 
    public Statement elementAt(int i)  { 
-      return (Statement)list.elementAt(i); 
+      return list.elementAt(i); 
    }
 
    public int size() { 

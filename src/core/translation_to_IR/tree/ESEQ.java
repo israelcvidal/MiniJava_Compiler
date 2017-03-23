@@ -1,6 +1,5 @@
-package Tree;
-import Temp.Temp;
-import Temp.Label;
+package core.translation_to_IR.tree;
+
 public class ESEQ extends Exp {
   public Stm stm;
   public Exp exp;

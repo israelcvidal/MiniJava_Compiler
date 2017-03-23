@@ -1,12 +1,14 @@
-package Tree;
-import Temp.Temp;
-import Temp.Label;
+package core.translation_to_IR.tree;
+
+import core.activation_records.temp.Label;
+import core.activation_records.temp.LabelList;
+
 public class JUMP extends Stm {
   public Exp exp;
-  public Temp.LabelList targets;
-  public JUMP(Exp e, Temp.LabelList t) {exp=e; targets=t;}
-  public JUMP(Temp.Label target) {
-      this(new NAME(target), new Temp.LabelList(target,null));
+  public LabelList targets;
+  public JUMP(Exp e, LabelList t) {exp=e; targets=t;}
+  public JUMP(Label target) {
+      this(new NAME(target), new LabelList(target,null));
   }
   public ExpList kids() {return new ExpList(exp,null);}
   public Stm build(ExpList kids) {

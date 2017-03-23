@@ -1,4 +1,5 @@
-package Tree;
+package core.translation_to_IR.tree;
+
 public class StmList {
   public Stm head;
   public StmList tail;

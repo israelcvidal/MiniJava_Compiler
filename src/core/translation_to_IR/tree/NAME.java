@@ -1,6 +1,7 @@
-package Tree;
-import Temp.Temp;
-import Temp.Label;
+package core.translation_to_IR.tree;
+
+import core.activation_records.temp.Label;
+
 public class NAME extends Exp {
   public Label label;
   public NAME(Label l) {label=l;}

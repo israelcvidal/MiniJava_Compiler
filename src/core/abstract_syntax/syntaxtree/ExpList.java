@@ -3,10 +3,10 @@ package core.abstract_syntax.syntaxtree;
 import java.util.Vector;
 
 public class ExpList {
-   private Vector list;
+   private Vector<Exp> list;
 
    public ExpList() {
-      list = new Vector();
+      list = new Vector<>();
    }
 
    public void addElement(Exp n) {
@@ -14,7 +14,7 @@ public class ExpList {
    }
 
    public Exp elementAt(int i)  { 
-      return (Exp)list.elementAt(i); 
+      return list.elementAt(i); 
    }
 
    public int size() { 

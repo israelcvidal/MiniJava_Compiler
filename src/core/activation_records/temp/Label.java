@@ -1,5 +1,5 @@
 package core.activation_records.temp;
-import Symbol.Symbol;
+import devel.to_do.Symbol;
 
 /**
  * A Label represents an address in assembly language.

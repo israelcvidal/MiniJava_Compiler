@@ -1,8 +1,9 @@
-package FlowGraph;
-import Temp.TempList;
-import Temp.Temp;
-import Graph.NodeList;
-import Graph.Node;
+package core.dataflow_analysis.flow_graph;
+
+import core.activation_records.temp.TempList;
+import core.dataflow_analysis.graph.NodeList;
+import core.dataflow_analysis.graph.Node;
+import core.dataflow_analysis.graph.Graph;
 
 /**
  * A control flow graph is a directed graph in which each edge
@@ -14,7 +15,7 @@ import Graph.Node;
  * @see AssemFlowGraph
  */
 
-public abstract class FlowGraph extends Graph.Graph {
+public abstract class FlowGraph extends Graph {
  /**
   * The set of temporaries defined by this instruction or block 
   */

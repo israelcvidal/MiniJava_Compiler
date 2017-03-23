@@ -1,6 +1,5 @@
-package Tree;
-import Temp.Temp;
-import Temp.Label;
+package core.translation_to_IR.tree;
+
 public class EXP extends Stm {
   public Exp exp; 
   public EXP(Exp e) {exp=e;}

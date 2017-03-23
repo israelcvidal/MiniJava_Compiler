@@ -2,7 +2,8 @@ package core.lexical_analysis;
 
 public class Main {
    
-   public static void main(String [] args) {
+   @SuppressWarnings("static-access")
+public static void main(String [] args) {
       try {
          new MiniJavaParser(System.in).Goal();
          System.out.println("Lexical analysis successfull");

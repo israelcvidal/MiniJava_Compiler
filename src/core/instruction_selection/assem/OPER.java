@@ -1,19 +1,22 @@
-package Assem;
+package core.instruction_selection.assem;
+
+import core.activation_records.temp.LabelList;
+import core.activation_records.temp.TempList;
 
 public class OPER extends Instr {
-   public Temp.TempList dst;   
-   public Temp.TempList src;
+   public TempList dst;   
+   public TempList src;
    public Targets jump;
 
-   public OPER(String a, Temp.TempList d, Temp.TempList s, Temp.LabelList j) {
+   public OPER(String a, TempList d, TempList s, LabelList j) {
       assem=a; dst=d; src=s; jump=new Targets(j);
    }
-   public OPER(String a, Temp.TempList d, Temp.TempList s) {
+   public OPER(String a, TempList d, TempList s) {
       assem=a; dst=d; src=s; jump=null;
    }
 
-   public Temp.TempList use() {return src;}
-   public Temp.TempList def() {return dst;}
+   public TempList use() {return src;}
+   public TempList def() {return dst;}
    public Targets jumps() {return jump;}
 
 }

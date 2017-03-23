@@ -1,13 +1,16 @@
-package Tree;
+package core.translation_to_IR.tree;
+
+import core.activation_records.temp.DefaultMap;
+import core.activation_records.temp.TempMap;
 
 public class Print {
 
   java.io.PrintStream out;
-  Temp.TempMap tmap;
+  TempMap tmap;
 
-  public Print(java.io.PrintStream o, Temp.TempMap t) {out=o; tmap=t;}
+  public Print(java.io.PrintStream o, TempMap t) {out=o; tmap=t;}
 
-  public Print(java.io.PrintStream o) {out=o; tmap=new Temp.DefaultMap();}
+  public Print(java.io.PrintStream o) {out=o; tmap=new DefaultMap();}
 
   void indent(int d) {
       for(int i=0; i<d; i++) 

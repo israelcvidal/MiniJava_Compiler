@@ -24,11 +24,11 @@ void Goal() :
 void MiniJavaToken():
 {}
 {
-  "class"  |  <IDENTIFIER> | "{" | "public" | "static" | "void" |
+  "class" | "{" | "public" | "static" | "void" |
   "main" | "(" | "String"  | "[" | "]" | ")" | "}" | "extends" | ";"
   | "return" | "," | "int" | "boolean" | "=" | "if" | "else" | "while"
   | "System.out.println" | "&&" | "<" | "+" | "-" | "*" | "." |
-  "length" | <INTEGER_LITERAL> | "true" | "false" | "this" | "new" |
+  "length" |  "true" | "false" | "this" | "new" |
   "!"
 }
 
