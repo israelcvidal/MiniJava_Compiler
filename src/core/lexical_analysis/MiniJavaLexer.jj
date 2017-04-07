@@ -12,89 +12,89 @@ PARSER_END(MiniJavaParser)
 
 SKIP: { //White space
 	" "
-	"\t"
-	"\n"
-	"\r"
-	"\f"
+	|"\t"
+	|"\n"
+	|"\r"
+	|"\f"
 }
 
-SPECTIAL-TOKEN: { //Comentários
-	< SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n") >
-	< FORMAT_COMMENT: "/**" (["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*"))* "/" >
-	< MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*")* "*"))* "/" >
+SPECIAL_TOKEN : { //Comments
+  <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <FORMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+| <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
 TOKEN: { //Reserved words / markers
 	//MARKERS
 	< LPAREN: "(" >
-	< RPAREN: ")" >
-	< LSQPAREN: "[" >
-	< RSQPAREN: "]" >
-	< LBRACE: "{" >
-	< RBRACE: "}" >
-	< SEMICOLON: ";" >
-	< DOT: "." >
+	|< RPAREN: ")" >
+	|< LSQPAREN: "[" >
+	|< RSQPAREN: "]" >
+	|< LBRACE: "{" >
+	|< RBRACE: "}" >
+	|< SEMICOLON: ";" >
+	|< DOT: "." >
 	
 	//ARITHMETIC OPERATORS
-	< PLUS: "+" >
-	< MINUS: "-" >
-	< TIMES: "*" >
-	< DIVIDED: "/" >
-	< ASSIGN: "=" >
+	|< PLUS: "+" >
+	|< MINUS: "-" >
+	|< TIMES: "*" >
+	|< DIVIDED: "/" >
+	|< ASSIGN: "=" >
 
 	//CONDITIONNAL
-	< ELSE: "else" >
-	< IF: "if" >
-	< FALSE: "false" >
-	< TRUE: "true" >
+	|< ELSE: "else" >
+	|< IF: "if" >
+	|< FALSE: "false" >
+	|< TRUE: "true" >
 
 	//LOGIC OPERATORS 
-	< AND: "&&" >
-	< NOT: "!" >
-	< LT: "<" >
-	< GT: ">" >
-	< EQUALS: "==" >
+	|< AND: "&&" >
+	|< NOT: "!" >
+	|< LT: "<" >
+	|< GT: ">" >
+	|< EQUALS: "==" >
 
 	//VARIABLES TYPES
-	< BOOLEAN: "boolean" >
-	< INTEGER: "int" >
-	< VOID: "void" >
-	< STRING: "String" >
+	|< BOOLEAN: "boolean" >
+	|< INTEGER: "int" >
+	|< VOID: "void" >
+	|< STRING: "String" >
 
 	//OO TOKENS
-	< CLASS: "class" >
-	< INTERFACE: "interface" >
-	< EXTENDS: "extends" >
-	< MAIN: "main" >
-	< NEW: "new" >
-	< PUBLIC: "public" >
-	< THIS: "this" >
+	|< CLASS: "class" >
+	|< INTERFACE: "interface" >
+	|< EXTENDS: "extends" >
+	|< MAIN: "main" >
+	|< NEW: "new" >
+	|< PUBLIC: "public" >
+	|< THIS: "this" >
 	
 	
 	//MISCELANEOUS
-	< PRINT: "System.out.println" >
-	< RETURN: "return" >
-	< WHILE: "while" >
-	< LENGTH: "length" >
+	|< PRINT: "System.out.println" >
+	|< RETURN: "return" >
+	|< WHILE: "while" >
+	|< LENGTH: "length" >
 	
 	//Literals
-	<  INTEGER_LITERAL: ( ["1"-"9"] (["0"-"9"])* | "0" ) >
+	|<  INTEGER_LITERAL: ( ["1"-"9"] (["0"-"9"])* | "0" ) >
 
 	//Identifiers
-	< IDENTIFIER: < LETTER > (< LETTER >| < DIGIT >)* >
+	|< IDENTIFIER: < LETTER > (< LETTER >| < DIGIT >)* >
 
-	< #LETTER:
+	|< #LETTER:
 		[
-			"\u0024", //unicode from to $
-			"\u0041"-"\u005a", //unicode form to A-Z
-			"\u005f", //unicode from to _
-			"\u0061"-"\u007a", //unicode from to a-z
+			"$", //unicode from to $
+			"A"-"Z", //unicode form to A-Z
+			"_", //unicode from to _
+			"a"-"z" //unicode from to a-z
 		]
 	>	
 
-	< #DIGIT:
+	|< #DIGIT:
       	[
-	       "\u0030"-"\u0039" //unicode form of 0-9 digit character 
+	       "0"-"9" //unicode form of 0-9 digit character 
       	]
   	>
 }
@@ -106,10 +106,85 @@ TOKEN: { //Reserved words / markers
 void Goal() :
 {}
 {
-  ( MiniJavaToken() )*
-  <EOF>
+  Program()
 }
 
+void Program() :
+{}
+{
+	MainClass()
+	( ClassDeclaration() )*
+	<EOF>
+}
+
+void MainClass() :
+{}
+{
+	"class" Identifier() "{" "public" "static" "void" "main" "(" "String" "[" "]" Identifier() ")" "{" Statement() "}" "}"
+}
+
+void ClassDeclaration() :
+{}
+{
+	"class" Identifier() ( "extends" Identifier() )? "{" ( VarDeclaration() )* ( MethodDeclaration() )* "}"
+}
+
+void VarDeclaration() :
+{}
+{
+	Type() Identifier() ";"
+}
+
+void MethodDeclaration() :
+{}
+{
+	"public" Type() Identifier() "(" ( Type() Identifier() ( "," Type() Identifier() )* )? ")" "{" ( VarDeclaration() )* ( Statement() )* "return" Expression() ";" "}"
+}
+
+void Type() :
+{}
+{
+	"int" "[" "]"
+	|"boolean"
+	| "int"
+	| Identifier()
+}
+
+void Statement() :
+{}
+{
+	"{" ( Statement() )* "}"
+	| "if" "(" Expression() ")" Statement() "else" Statement()
+	| "while" "(" Expression() ")" Statement()
+	| "System.out.println" "(" Expression() ")" ";"
+	| Identifier() "=" Expression() ";"
+	| Identifier() "[" Expression() "]" "=" Expression() ";"
+}
+
+
+void Expression() :
+{}
+{
+	 Expression() ( "&&" | "<" | "+" | "-" | "*" ) Expression()
+	| Expression() "[" Expression() "]"
+	| Expression() "." "length"
+	| Expression() "." Identifier() "(" ( Expression() ( "," Expression() )* )? ")"
+	| <INTEGER_LITERAL>
+	| "true"
+	| "false"
+	| Identifier()
+	| "this"
+	| "new" "int" "[" Expression() "]"
+	| "new" Identifier() "(" ")"
+	| "!" Expression()
+	| "(" Expression() ")"
+}
+
+void Identifier() :
+{}
+{
+	< IDENTIFIER >
+}
 void MiniJavaToken():
 {}
 {
