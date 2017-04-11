@@ -1,1 +1,11 @@
-package core.translation_to_IR.tree;abstract public class Exp {	abstract public ExpList kids();	abstract public Exp build(ExpList kids);}
+package core.translation_to_IR.tree;
+
+public class EXP extends Stm {
+  public Exp exp; 
+  public EXP(Exp e) {exp=e;}
+  public ExpList kids() {return new ExpList(exp,null);}
+  public Stm build(ExpList kids) {
+    return new EXP(kids.head);
+  }
+}
+

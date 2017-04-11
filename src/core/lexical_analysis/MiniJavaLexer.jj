@@ -144,9 +144,8 @@ void MethodDeclaration() :
 void Type() :
 {}
 {
-	"int" "[" "]"
+	"int" ("[" "]")*
 	|"boolean"
-	| "int"
 	| Identifier()
 }
 
@@ -157,28 +156,39 @@ void Statement() :
 	| "if" "(" Expression() ")" Statement() "else" Statement()
 	| "while" "(" Expression() ")" Statement()
 	| "System.out.println" "(" Expression() ")" ";"
-	| Identifier() "=" Expression() ";"
-	| Identifier() "[" Expression() "]" "=" Expression() ";"
+	| Identifier()	("=" Expression() ";"
+					| "[" Expression() "]" "=" Expression() ";"
+					)
 }
 
 
 void Expression() :
 {}
 {
-	 Expression() ( "&&" | "<" | "+" | "-" | "*" ) Expression()
-	| Expression() "[" Expression() "]"
-	| Expression() "." "length"
-	| Expression() "." Identifier() "(" ( Expression() ( "," Expression() )* )? ")"
-	| <INTEGER_LITERAL>
+	 TerminalExpression()
+	( ( "&&" | "<" | "+" | "-" | "*" ) Expression()
+		| "[" Expression() "]"
+		| "." 	("length" 
+				| Identifier() "(" ( Expression() ( "," Expression() )* )? ")" 
+				)
+	)*
+}
+
+void TerminalExpression():
+{}
+{
+	<INTEGER_LITERAL>
 	| "true"
 	| "false"
 	| Identifier()
 	| "this"
-	| "new" "int" "[" Expression() "]"
-	| "new" Identifier() "(" ")"
+	| "new"	("int" "[" Expression() "]"
+			| Identifier() "(" ")"
+			)
 	| "!" Expression()
 	| "(" Expression() ")"
 }
+
 
 void Identifier() :
 {}
