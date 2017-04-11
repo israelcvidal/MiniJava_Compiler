@@ -69,6 +69,7 @@ TOKEN: { //Reserved words / markers
 	|< NEW: "new" >
 	|< PUBLIC: "public" >
 	|< THIS: "this" >
+	|< STATIC: "static">
 	
 	
 	//MISCELANEOUS
