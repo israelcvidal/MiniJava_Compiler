@@ -6,10 +6,6 @@ PARSER_BEGIN(MiniJavaParser)
   public class MiniJavaParser {}
 PARSER_END(MiniJavaParser)
 
-
-// Insert a specification of a lexical analysis here. 
-//Code based from example: web.cs.ucla.edu/classes/fall03/cs132/project/minijava.jj
-
 SKIP: { //White space
 	" "
 	|"\t"
@@ -20,11 +16,10 @@ SKIP: { //White space
 
 SPECIAL_TOKEN : { //Comments
   <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
-| <FORMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
-TOKEN: { //Reserved words / markers
+TOKEN: { //Reserved words
 	//MARKERS
 	< LPAREN: "(" >
 	|< RPAREN: ")" >
@@ -33,6 +28,7 @@ TOKEN: { //Reserved words / markers
 	|< LBRACE: "{" >
 	|< RBRACE: "}" >
 	|< SEMICOLON: ";" >
+	|< COMMA : "," >
 	|< DOT: "." >
 	
 	//ARITHMETIC OPERATORS
@@ -58,51 +54,45 @@ TOKEN: { //Reserved words / markers
 	//VARIABLES TYPES
 	|< BOOLEAN: "boolean" >
 	|< INTEGER: "int" >
-	|< VOID: "void" >
-	|< STRING: "String" >
-
+	
 	//OO TOKENS
 	|< CLASS: "class" >
-	|< INTERFACE: "interface" >
 	|< EXTENDS: "extends" >
 	|< MAIN: "main" >
 	|< NEW: "new" >
 	|< PUBLIC: "public" >
 	|< THIS: "this" >
-	|< STATIC: "static">
-	
+	|< STATIC: "static">	
 	
 	//MISCELANEOUS
 	|< PRINT: "System.out.println" >
 	|< RETURN: "return" >
 	|< WHILE: "while" >
 	|< LENGTH: "length" >
+	|< STRING: "String" >
+	|< VOID: "void" >
 	
 	//Literals
-	|<  INTEGER_LITERAL: ( ["1"-"9"] (["0"-"9"])* | "0" ) >
+	|<  INTEGER_LITERAL: ( ["1"-"9"] (<DIGIT >)* | "0" ) >
 
 	//Identifiers
 	|< IDENTIFIER: < LETTER > (< LETTER >| < DIGIT >)* >
 
 	|< #LETTER:
 		[
-			"$", //unicode from to $
-			"A"-"Z", //unicode form to A-Z
-			"_", //unicode from to _
-			"a"-"z" //unicode from to a-z
+			"$",
+			"A"-"Z",
+			"_",
+			"a"-"z"
 		]
-	>	
+	 >	
 
 	|< #DIGIT:
       	[
-	       "0"-"9" //unicode form of 0-9 digit character 
+	       "0"-"9" 
       	]
-  	>
+  	 >
 }
-
-// The following is a simple grammar that will allow you
-// to test the generated lexer.
-
 
 void Goal() :
 {}
@@ -121,90 +111,105 @@ void Program() :
 void MainClass() :
 {}
 {
-	"class" Identifier() "{" "public" "static" "void" "main" "(" "String" "[" "]" Identifier() ")" "{" Statement() "}" "}"
+	< CLASS > < IDENTIFIER > < LBRACE > < PUBLIC > < STATIC > < VOID > < MAIN > < LPAREN > < STRING > < LSQPAREN > < RSQPAREN > < IDENTIFIER > < RPAREN > < LBRACE > Statement() < RBRACE > < RBRACE >
 }
 
 void ClassDeclaration() :
 {}
 {
-	"class" Identifier() ( "extends" Identifier() )? "{" ( VarDeclaration() )* ( MethodDeclaration() )* "}"
+	< CLASS > < IDENTIFIER > ( < EXTENDS > < IDENTIFIER > )? < LBRACE > ( VarDeclaration() )* ( MethodDeclaration() )* < RBRACE >
 }
 
 void VarDeclaration() :
 {}
 {
-	Type() Identifier() ";"
+	Type() < IDENTIFIER > < SEMICOLON >
 }
 
 void MethodDeclaration() :
 {}
 {
-	"public" Type() Identifier() "(" ( Type() Identifier() ( "," Type() Identifier() )* )? ")" "{" ( VarDeclaration() )* ( Statement() )* "return" Expression() ";" "}"
+	< PUBLIC > Type() < IDENTIFIER > < LPAREN > FormalList() < RPAREN > < LBRACE > ( LOOKAHEAD(2) VarDeclaration() )* ( Statement() )* < RETURN > Expression() < SEMICOLON > < RBRACE >
+}
+
+void FormalList() :
+{}
+{
+	Type() < IDENTIFIER > (FormalRest())*
+}
+
+void FormalRest() :
+{}
+{
+	"," Type() < IDENTIFIER >
 }
 
 void Type() :
 {}
 {
-	"int" ("[" "]")*
-	|"boolean"
-	| Identifier()
+	< INTEGER > ( < LSQPAREN > < RSQPAREN > ) ?
+	|< BOOLEAN >
+	| < IDENTIFIER >
 }
 
 void Statement() :
 {}
 {
-	"{" ( Statement() )* "}"
-	| "if" "(" Expression() ")" Statement() "else" Statement()
-	| "while" "(" Expression() ")" Statement()
-	| "System.out.println" "(" Expression() ")" ";"
-	| Identifier()	("=" Expression() ";"
-					| "[" Expression() "]" "=" Expression() ";"
+	< LBRACE > ( Statement() )* < RBRACE >
+	| < IF > < LPAREN > Expression() < RPAREN > Statement() < ELSE > Statement()
+	| < WHILE > < LPAREN > Expression() < RPAREN > Statement()
+	| < PRINT > < LPAREN > Expression() < RPAREN > < SEMICOLON >
+	| < IDENTIFIER >	(< ASSIGN > Expression() < SEMICOLON > |
+						 < LSQPAREN > Expression() < RSQPAREN > < ASSIGN > Expression() < SEMICOLON >
 					)
 }
-
 
 void Expression() :
 {}
 {
-	 TerminalExpression()
-	( ( "&&" | "<" | "+" | "-" | "*" ) Expression()
-		| "[" Expression() "]"
-		| "." 	("length" 
-				| Identifier() "(" ( Expression() ( "," Expression() )* )? ")" 
-				)
-	)*
+	 <INTEGER_LITERAL> Expression_() |
+	 < TRUE > Expression_() |
+	 < FALSE > Expression_() |
+	 < IDENTIFIER > Expression_() |
+	 < THIS > Expression_() |
+	 < NEW > (  < INTEGER > < LSQPAREN > Expression() < RSQPAREN > Expression_() |
+	 			< IDENTIFIER > < LPAREN > < RPAREN > Expression_() ) |
+	 < NOT > Expression() Expression_() |
+	 < LPAREN > Expression() < RPAREN > Expression_()
+  	
 }
 
-void TerminalExpression():
+void Expression_() :
 {}
 {
-	<INTEGER_LITERAL>
-	| "true"
-	| "false"
-	| Identifier()
-	| "this"
-	| "new"	("int" "[" Expression() "]"
-			| Identifier() "(" ")"
-			)
-	| "!" Expression()
-	| "(" Expression() ")"
+	(	  (< AND > | < LT > | < PLUS > | < MINUS > | < TIMES >) Expression() Expression_() |
+	< LSQPAREN > Expression() < RSQPAREN > Expression_() |
+	< DOT > ( < LENGTH > Expression_() |
+			  < IDENTIFIER > < LPAREN > ExpList() < RPAREN > Expression_()))?
 }
 
-
-void Identifier() :
+void ExpList() :
 {}
 {
-	< IDENTIFIER >
+	( Expression() ( ExpRest() )* )
 }
+
+void ExpRest() :
+{}
+{
+	< COMMA > Expression()
+
+}
+
 void MiniJavaToken():
 {}
 {
-  "class" | "{" | "public" | "static" | "void" |
-  "main" | "(" | "String"  | "[" | "]" | ")" | "}" | "extends" | ";"
-  | "return" | "," | "int" | "boolean" | "=" | "if" | "else" | "while"
-  | "System.out.println" | "&&" | "<" | "+" | "-" | "*" | "." |
-  "length" |  "true" | "false" | "this" | "new" |
-  "!"
+  < CLASS > | < LBRACE > | < PUBLIC > | < STATIC > | < VOID > |
+  < MAIN > | < LPAREN > | < STRING >  | < LSQPAREN > | < RSQPAREN > | < RPAREN > | < RBRACE > | < EXTENDS > | < SEMICOLON >
+  | < RETURN > | < COMMA > | < INTEGER > | < BOOLEAN > | < ASSIGN > | < IF > | < ELSE > | < WHILE >
+  | < PRINT > | < AND > | < LT > | < PLUS > | < MINUS > | < TIMES > | < DOT > |
+  < LENGTH > |  < TRUE > | < FALSE > | < THIS > | < NEW > |
+  < NOT >
 }
 
 
