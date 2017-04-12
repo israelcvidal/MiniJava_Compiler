@@ -3,202 +3,197 @@ options {
 }
 
 PARSER_BEGIN(MiniJavaParser)
+  package core.lexical_analysis;
   public class MiniJavaParser {}
 PARSER_END(MiniJavaParser)
 
 SKIP: { //White space
-	" "
-	|"\t"
-	|"\n"
-	|"\r"
-	|"\f"
+		" "
+	|	"\t"
+	|	"\n"
+	|	"\r"
+	|	"\f"
 }
 
 SPECIAL_TOKEN : { //Comments
-  <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
-| <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+  		<SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+	| 	<MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
 TOKEN: { //Reserved words
 	//MARKERS
-	< LPAREN: "(" >
-	|< RPAREN: ")" >
-	|< LSQPAREN: "[" >
-	|< RSQPAREN: "]" >
-	|< LBRACE: "{" >
-	|< RBRACE: "}" >
-	|< SEMICOLON: ";" >
-	|< COMMA : "," >
-	|< DOT: "." >
+		< LPAREN: "(" >
+	|	< RPAREN: ")" >
+	|	< LSQPAREN: "[" >
+	|	< RSQPAREN: "]" >
+	|	< LBRACE: "{" >
+	|	< RBRACE: "}" >
+	|	< SEMICOLON: ";" >
+	|	< COMMA : "," >
+	|	< DOT: "." >
 	
 	//ARITHMETIC OPERATORS
-	|< PLUS: "+" >
-	|< MINUS: "-" >
-	|< TIMES: "*" >
-	|< DIVIDED: "/" >
-	|< ASSIGN: "=" >
+	|	< PLUS: "+" >
+	|	< MINUS: "-" >
+	|	< TIMES: "*" >
+	|	< DIVIDED: "/" >
+	|	< ASSIGN: "=" >
 
 	//CONDITIONNAL
-	|< ELSE: "else" >
-	|< IF: "if" >
-	|< FALSE: "false" >
-	|< TRUE: "true" >
+	|	< ELSE: "else" >
+	|	< IF: "if" >
+	|	< FALSE: "false" >
+	|	< TRUE: "true" >
 
 	//LOGIC OPERATORS 
-	|< AND: "&&" >
-	|< NOT: "!" >
-	|< LT: "<" >
-	|< GT: ">" >
-	|< EQUALS: "==" >
+	|	< AND: "&&" >
+	|	< NOT: "!" >
+	|	< LT: "<" >
+	|	< GT: ">" >
+	|	< EQUALS: "==" >
 
 	//VARIABLES TYPES
-	|< BOOLEAN: "boolean" >
-	|< INTEGER: "int" >
+	|	< BOOLEAN: "boolean" >
+	|	< INTEGER: "int" >
 	
 	//OO TOKENS
-	|< CLASS: "class" >
-	|< EXTENDS: "extends" >
-	|< MAIN: "main" >
-	|< NEW: "new" >
-	|< PUBLIC: "public" >
-	|< THIS: "this" >
-	|< STATIC: "static">	
+	|	< CLASS: "class" >
+	|	< EXTENDS: "extends" >
+	|	< MAIN: "main" >
+	|	< NEW: "new" >
+	|	< PUBLIC: "public" >
+	|	< THIS: "this" >
+	|	< STATIC: "static">	
 	
 	//MISCELANEOUS
-	|< PRINT: "System.out.println" >
-	|< RETURN: "return" >
-	|< WHILE: "while" >
-	|< LENGTH: "length" >
-	|< STRING: "String" >
-	|< VOID: "void" >
+	|	< PRINT: "System.out.println" >
+	|	< RETURN: "return" >
+	|	< WHILE: "while" >
+	|	< LENGTH: "length" >
+	|	< STRING: "String" >
+	|	< VOID: "void" >
 	
 	//Literals
-	|<  INTEGER_LITERAL: ( ["1"-"9"] (<DIGIT >)* | "0" ) >
+	|	<  INTEGER_LITERAL: ( ["1"-"9"] (<DIGIT >)* | "0" ) >
 
 	//Identifiers
-	|< IDENTIFIER: < LETTER > (< LETTER >| < DIGIT >)* >
+	|	< IDENTIFIER: < LETTER > (< LETTER >| < DIGIT >)* >
 
-	|< #LETTER:
-		[
+	|	< #LETTER:
+			[
 			"$",
 			"A"-"Z",
 			"_",
 			"a"-"z"
-		]
-	 >	
+			]
+	 	>	
 
-	|< #DIGIT:
-      	[
+	|	< #DIGIT:
+      		[
 	       "0"-"9" 
-      	]
-  	 >
+      		]
+  	 	>
 }
 
-void Goal() :
+void Goal():
 {}
 {
   Program()
+  <EOF>
 }
 
-void Program() :
+void Program():
 {}
 {
-	MainClass()
-	( ClassDeclaration() )*
-	<EOF>
+  MainClass()
+  ( ClassDeclaration() )*
 }
 
-void MainClass() :
+void MainClass():
 {}
 {
-	< CLASS > < IDENTIFIER > < LBRACE > < PUBLIC > < STATIC > < VOID > < MAIN > < LPAREN > < STRING > < LSQPAREN > < RSQPAREN > < IDENTIFIER > < RPAREN > < LBRACE > Statement() < RBRACE > < RBRACE >
+  < CLASS > < IDENTIFIER > < LBRACE > < PUBLIC > < STATIC > < VOID > < MAIN > < LPAREN > < STRING > < LSQPAREN > < RSQPAREN > < IDENTIFIER > < RPAREN > < LBRACE > Statement() < RBRACE > < RBRACE >
 }
 
-void ClassDeclaration() :
+void ClassDeclaration():
 {}
 {
-	< CLASS > < IDENTIFIER > ( < EXTENDS > < IDENTIFIER > )? < LBRACE > ( VarDeclaration() )* ( MethodDeclaration() )* < RBRACE >
+  < CLASS > < IDENTIFIER > ( < EXTENDS > < IDENTIFIER > )? < LBRACE > ( VarDeclaration() )* ( MethodDeclaration() )* < RBRACE >
 }
 
-void VarDeclaration() :
+void VarDeclaration():
 {}
 {
-	Type() < IDENTIFIER > < SEMICOLON >
+  Type() < IDENTIFIER > < SEMICOLON >
 }
 
-void MethodDeclaration() :
+void MethodDeclaration():
 {}
 {
-	< PUBLIC > Type() < IDENTIFIER > < LPAREN > FormalList() < RPAREN > < LBRACE > ( LOOKAHEAD(2) VarDeclaration() )* ( Statement() )* < RETURN > Expression() < SEMICOLON > < RBRACE >
+  < PUBLIC > Type() < IDENTIFIER > < LPAREN > FormalList() < RPAREN > < LBRACE > ( LOOKAHEAD(2) VarDeclaration() )* ( Statement() )* < RETURN > Expression() < SEMICOLON > < RBRACE >
 }
 
-void FormalList() :
+void FormalList():
 {}
 {
-	Type() < IDENTIFIER > (FormalRest())*
+  Type() < IDENTIFIER > (FormalRest())*
 }
 
-void FormalRest() :
+void FormalRest():
 {}
 {
-	"," Type() < IDENTIFIER >
+  < COMMA > Type() < IDENTIFIER >
 }
 
-void Type() :
+void Type():
 {}
-{
-	< INTEGER > ( < LSQPAREN > < RSQPAREN > ) ?
-	|< BOOLEAN >
-	| < IDENTIFIER >
+{ < INTEGER > ( < LSQPAREN > < RSQPAREN > )?
+| < BOOLEAN >
+| < IDENTIFIER >
 }
 
-void Statement() :
+void Statement():
 {}
-{
-	< LBRACE > ( Statement() )* < RBRACE >
-	| < IF > < LPAREN > Expression() < RPAREN > Statement() < ELSE > Statement()
-	| < WHILE > < LPAREN > Expression() < RPAREN > Statement()
-	| < PRINT > < LPAREN > Expression() < RPAREN > < SEMICOLON >
-	| < IDENTIFIER >	(< ASSIGN > Expression() < SEMICOLON > |
-						 < LSQPAREN > Expression() < RSQPAREN > < ASSIGN > Expression() < SEMICOLON >
-					)
+{ < LBRACE > ( Statement() )* < RBRACE >
+| < IF > < LPAREN > Expression() < RPAREN > Statement() < ELSE > Statement()
+| < WHILE > < LPAREN > Expression() < RPAREN > Statement()
+| < PRINT > < LPAREN > Expression() < RPAREN > < SEMICOLON >
+| < IDENTIFIER > ( < ASSIGN > Expression() < SEMICOLON >
+				 | < LSQPAREN > Expression() < RSQPAREN > < ASSIGN > Expression() < SEMICOLON >
+				 )
 }
 
-void Expression() :
+void Expression():
 {}
-{
-	 <INTEGER_LITERAL> Expression_() |
-	 < TRUE > Expression_() |
-	 < FALSE > Expression_() |
-	 < IDENTIFIER > Expression_() |
-	 < THIS > Expression_() |
-	 < NEW > (  < INTEGER > < LSQPAREN > Expression() < RSQPAREN > Expression_() |
-	 			< IDENTIFIER > < LPAREN > < RPAREN > Expression_() ) |
-	 < NOT > Expression() Expression_() |
-	 < LPAREN > Expression() < RPAREN > Expression_()
-  	
+{ ( <INTEGER_LITERAL>
+  | < TRUE >
+  | < FALSE >
+  | < IDENTIFIER >
+  | < THIS >
+  | < NEW > ( < INTEGER > < LSQPAREN > Expression() < RSQPAREN > | < IDENTIFIER > < LPAREN > < RPAREN > )
+  | < NOT > Expression()
+  | < LPAREN > Expression() < RPAREN >
+  ) Expression_()
 }
 
-void Expression_() :
+void Expression_():
 {}
-{
-	(	  (< AND > | < LT > | < PLUS > | < MINUS > | < TIMES >) Expression() Expression_() |
-	< LSQPAREN > Expression() < RSQPAREN > Expression_() |
-	< DOT > ( < LENGTH > Expression_() |
-			  < IDENTIFIER > < LPAREN > ExpList() < RPAREN > Expression_()))?
+{ ( LOOKAHEAD(2) ( ( < AND > | < LT > | < PLUS > | < MINUS > | < TIMES > ) Expression()			     | < LSQPAREN > Expression() < RSQPAREN >
+			     | < DOT > ( < LENGTH > | < IDENTIFIER > < LPAREN > ExpList() < RPAREN > )
+			     ) Expression_()
+  )?
 }
 
-void ExpList() :
+void ExpList():
 {}
 {
-	( Expression() ( ExpRest() )* )
+  Expression() ( ExpRest() )*
 }
 
-void ExpRest() :
+void ExpRest():
 {}
 {
-	< COMMA > Expression()
-
+  < COMMA > Expression()
 }
 
 void MiniJavaToken():
