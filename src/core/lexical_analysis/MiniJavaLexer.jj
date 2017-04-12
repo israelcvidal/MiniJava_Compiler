@@ -1,0 +1,210 @@
+options {
+  JAVA_UNICODE_ESCAPE = true;
+}
+
+PARSER_BEGIN(MiniJavaParser)
+  package core.lexical_analysis;
+  public class MiniJavaParser {}
+PARSER_END(MiniJavaParser)
+
+SKIP: { //White space
+		" "
+	|	"\t"
+	|	"\n"
+	|	"\r"
+	|	"\f"
+}
+
+SPECIAL_TOKEN : { //Comments
+  		<SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+	| 	<MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
+
+TOKEN: { //Reserved words
+	//MARKERS
+		< LPAREN: "(" >
+	|	< RPAREN: ")" >
+	|	< LSQPAREN: "[" >
+	|	< RSQPAREN: "]" >
+	|	< LBRACE: "{" >
+	|	< RBRACE: "}" >
+	|	< SEMICOLON: ";" >
+	|	< COMMA : "," >
+	|	< DOT: "." >
+	
+	//ARITHMETIC OPERATORS
+	|	< PLUS: "+" >
+	|	< MINUS: "-" >
+	|	< TIMES: "*" >
+	|	< DIVIDED: "/" >
+	|	< ASSIGN: "=" >
+
+	//CONDITIONNAL
+	|	< ELSE: "else" >
+	|	< IF: "if" >
+	|	< FALSE: "false" >
+	|	< TRUE: "true" >
+
+	//LOGIC OPERATORS 
+	|	< AND: "&&" >
+	|	< NOT: "!" >
+	|	< LT: "<" >
+	|	< GT: ">" >
+	|	< EQUALS: "==" >
+
+	//VARIABLES TYPES
+	|	< BOOLEAN: "boolean" >
+	|	< INTEGER: "int" >
+	
+	//OO TOKENS
+	|	< CLASS: "class" >
+	|	< EXTENDS: "extends" >
+	|	< MAIN: "main" >
+	|	< NEW: "new" >
+	|	< PUBLIC: "public" >
+	|	< THIS: "this" >
+	|	< STATIC: "static">	
+	
+	//MISCELANEOUS
+	|	< PRINT: "System.out.println" >
+	|	< RETURN: "return" >
+	|	< WHILE: "while" >
+	|	< LENGTH: "length" >
+	|	< STRING: "String" >
+	|	< VOID: "void" >
+	
+	//Literals
+	|	<  INTEGER_LITERAL: ( ["1"-"9"] (<DIGIT >)* | "0" ) >
+
+	//Identifiers
+	|	< IDENTIFIER: < LETTER > (< LETTER >| < DIGIT >)* >
+
+	|	< #LETTER:
+			[
+			"$",
+			"A"-"Z",
+			"_",
+			"a"-"z"
+			]
+	 	>	
+
+	|	< #DIGIT:
+      		[
+	       "0"-"9" 
+      		]
+  	 	>
+}
+
+void Goal():
+{}
+{
+  Program()
+  <EOF>
+}
+
+void Program():
+{}
+{
+  MainClass()
+  ( ClassDeclaration() )*
+}
+
+void MainClass():
+{}
+{
+  < CLASS > < IDENTIFIER > < LBRACE > < PUBLIC > < STATIC > < VOID > < MAIN > < LPAREN > < STRING > < LSQPAREN > < RSQPAREN > < IDENTIFIER > < RPAREN > < LBRACE > Statement() < RBRACE > < RBRACE >
+}
+
+void ClassDeclaration():
+{}
+{
+  < CLASS > < IDENTIFIER > ( < EXTENDS > < IDENTIFIER > )? < LBRACE > ( VarDeclaration() )* ( MethodDeclaration() )* < RBRACE >
+}
+
+void VarDeclaration():
+{}
+{
+  Type() < IDENTIFIER > < SEMICOLON >
+}
+
+void MethodDeclaration():
+{}
+{
+  < PUBLIC > Type() < IDENTIFIER > < LPAREN > FormalList() < RPAREN > < LBRACE > ( LOOKAHEAD(2) VarDeclaration() )* ( Statement() )* < RETURN > Expression() < SEMICOLON > < RBRACE >
+}
+
+void FormalList():
+{}
+{
+  Type() < IDENTIFIER > (FormalRest())*
+}
+
+void FormalRest():
+{}
+{
+  < COMMA > Type() < IDENTIFIER >
+}
+
+void Type():
+{}
+{ < INTEGER > ( < LSQPAREN > < RSQPAREN > )?
+| < BOOLEAN >
+| < IDENTIFIER >
+}
+
+void Statement():
+{}
+{ < LBRACE > ( Statement() )* < RBRACE >
+| < IF > < LPAREN > Expression() < RPAREN > Statement() < ELSE > Statement()
+| < WHILE > < LPAREN > Expression() < RPAREN > Statement()
+| < PRINT > < LPAREN > Expression() < RPAREN > < SEMICOLON >
+| < IDENTIFIER > ( < ASSIGN > Expression() < SEMICOLON >
+				 | < LSQPAREN > Expression() < RSQPAREN > < ASSIGN > Expression() < SEMICOLON >
+				 )
+}
+
+void Expression():
+{}
+{ ( <INTEGER_LITERAL>
+  | < TRUE >
+  | < FALSE >
+  | < IDENTIFIER >
+  | < THIS >
+  | < NEW > ( < INTEGER > < LSQPAREN > Expression() < RSQPAREN > | < IDENTIFIER > < LPAREN > < RPAREN > )
+  | < NOT > Expression()
+  | < LPAREN > Expression() < RPAREN >
+  ) Expression_()
+}
+
+void Expression_():
+{}
+{ ( LOOKAHEAD(2) ( ( < AND > | < LT > | < PLUS > | < MINUS > | < TIMES > ) Expression()			     | < LSQPAREN > Expression() < RSQPAREN >
+			     | < DOT > ( < LENGTH > | < IDENTIFIER > < LPAREN > ExpList() < RPAREN > )
+			     ) Expression_()
+  )?
+}
+
+void ExpList():
+{}
+{
+  Expression() ( ExpRest() )*
+}
+
+void ExpRest():
+{}
+{
+  < COMMA > Expression()
+}
+
+void MiniJavaToken():
+{}
+{
+  < CLASS > | < LBRACE > | < PUBLIC > | < STATIC > | < VOID > |
+  < MAIN > | < LPAREN > | < STRING >  | < LSQPAREN > | < RSQPAREN > | < RPAREN > | < RBRACE > | < EXTENDS > | < SEMICOLON >
+  | < RETURN > | < COMMA > | < INTEGER > | < BOOLEAN > | < ASSIGN > | < IF > | < ELSE > | < WHILE >
+  | < PRINT > | < AND > | < LT > | < PLUS > | < MINUS > | < TIMES > | < DOT > |
+  < LENGTH > |  < TRUE > | < FALSE > | < THIS > | < NEW > |
+  < NOT >
+}
+
+
