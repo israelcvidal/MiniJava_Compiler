@@ -11,7 +11,7 @@ public class Main {
 	    try {
 	    	BufferedReader br = new BufferedReader(new FileReader("data.txt"));
 	    	
-	        new MiniJavaParser(br).Goal();
+	        new MiniJavaParser(br).Program();
 	        System.out.println("Lexical analysis successfull!");
 	        
 	    } catch (ParseException e) {

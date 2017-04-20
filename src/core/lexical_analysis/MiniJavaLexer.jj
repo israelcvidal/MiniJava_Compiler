@@ -4,6 +4,7 @@ options {
 
 PARSER_BEGIN(MiniJavaParser)
   package core.lexical_analysis;
+  import core.abstract_syntax.syntaxtree.*;
   public class MiniJavaParser {}
 PARSER_END(MiniJavaParser)
 
@@ -95,18 +96,14 @@ TOKEN: { //Reserved words
   	 	>
 }
 
-void Goal():
-{}
-{
-  Program()
-  <EOF>
-}
-
-void Program():
+Program Program():
 {}
 {
   MainClass()
   ( ClassDeclaration() )*
+  < EOF >
+  //TODO
+  { return null; }
 }
 
 void MainClass():
