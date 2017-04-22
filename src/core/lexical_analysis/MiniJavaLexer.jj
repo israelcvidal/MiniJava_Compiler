@@ -163,7 +163,7 @@ void VarDeclaration():
   {return new VarDecl(t,id);}
 }
 
-void MethodDeclaration():
+MethodDeclaration MethodDeclaration():
 {
   Type at;
   Identifier ai;
@@ -179,26 +179,39 @@ void MethodDeclaration():
                     StatementList asl, Exp ae)}
 }
 
-void FormalList():
-{}
+FormalList FormalList():
 {
-  Type() < IDENTIFIER > (FormalRest())*
+	FormalList fl = new FormalList();
+	FormalRest f;
+	Type t;
+	Identifier id;
 }
-
-void FormalRest():
-{}
 {
-  < COMMA > Type() < IDENTIFIER >
+  t = Type() id = < IDENTIFIER > (f = FormalRest() {fl.addElement(f);})*
+  {return fl;}
 }
 
-void Type():
-{}
-{ < INTEGER > ( < LSQPAREN > < RSQPAREN > )?
-| < BOOLEAN >
-| < IDENTIFIER >
+Formal FormalRest():
+{
+	Type t;
+	Identifier id;
+}
+{
+  < COMMA > t = Type() id = < IDENTIFIER >
+
+  {return new Formal(t,id);}
 }
 
-void Statement():
+Type Type():
+{
+  IdentifierType it;
+}
+{ < INTEGER > {t = new IntegerType();} ( < LSQPAREN > < RSQPAREN > {t = new IntArrayType();})?
+| < BOOLEAN > {t = new BooleanType();}
+| < IDENTIFIER > {t = new IntegerType();}
+}
+
+StatementList Statement():
 {
   	StatementList s,ifStm,elseStm,stms = new StatementList();
 	Exp ae, aeI;
@@ -214,20 +227,26 @@ void Statement():
 	{return stms; }
 }
 
-void Expression():
-{}
-{ ( <INTEGER_LITERAL>
-  | < TRUE >
-  | < FALSE >
-  | < IDENTIFIER >
-  | < THIS >
-  | < NEW > ( < INTEGER > < LSQPAREN > Expression() < RSQPAREN > | < IDENTIFIER > < LPAREN > < RPAREN > )
-  | < NOT > Expression()
-  | < LPAREN > Expression() < RPAREN >
+Exp Expression():
+{
+	Exp exp;
+	IntegerLiteral i;
+	Identifier id;
+}
+{ ( i = <INTEGER_LITERAL> {exp = new IntegerLiteral(i);}
+  | < TRUE > {exp = new True();}
+  | < FALSE > {exp = new False();}
+  | id = < IDENTIFIER > {exp = new IdentifierExp(id.toString());}
+  | < THIS > { exp = new This();}
+  | < NEW > ( < INTEGER > < LSQPAREN > exp = Expression() < RSQPAREN > {exp = new NewArray(exp);} | id = < IDENTIFIER > < LPAREN > < RPAREN > {exp = new NewObject(id);} )
+  | < NOT > exp = Expression() { exp = new Not(exp);}
+  | < LPAREN > exp = Expression() < RPAREN >
   ) Expression_()
+
+  {return exp;}
 }
 
-void Expression_():
+Exp Expression_():
 {}
 { ( LOOKAHEAD(2) ( ( < AND > | < LT > | < PLUS > | < MINUS > | < TIMES > ) Expression()			     | < LSQPAREN > Expression() < RSQPAREN >
 			     | < DOT > ( < LENGTH > | < IDENTIFIER > < LPAREN > ExpList() < RPAREN > )
@@ -235,16 +254,23 @@ void Expression_():
   )?
 }
 
-void ExpList():
-{}
+ExpList ExpList():
 {
-  Expression() ( ExpRest() )*
+	ExpList expl = new ExpList();
+	Exp exp;
+}
+{
+  exp = Expression() {expl.addElement(exp);} ( exp = ExpRest() {expl.addElement(exp);} )*
+  {return expl;}
 }
 
-void ExpRest():
-{}
+Exp ExpRest():
 {
-  < COMMA > Expression()
+	Exp exp;
+}
+{
+  < COMMA > exp = Expression()
+  {return exp;}
 }
 
 void MiniJavaToken():
