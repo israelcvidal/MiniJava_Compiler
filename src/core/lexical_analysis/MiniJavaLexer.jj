@@ -97,37 +97,86 @@ TOKEN: { //Reserved words
 }
 
 Program Program():
-{}
 {
-  MainClass()
-  ( ClassDeclaration() )*
+	MainClass mc;
+	ArrayList<ClassDecl> cdl;
+}
+{
+  mc = MainClass()
+  cdl = ClassDeclList()
   < EOF >
   //TODO
-  { return null; }
+  { return new Program(mc,cdl); }
 }
 
-void MainClass():
-{}
+ArrayList<ClassDecl> ClassDeclList() :
 {
-  < CLASS > < IDENTIFIER > < LBRACE > < PUBLIC > < STATIC > < VOID > < MAIN > < LPAREN > < STRING > < LSQPAREN > < RSQPAREN > < IDENTIFIER > < RPAREN > < LBRACE > Statement() < RBRACE > < RBRACE >
+  	ArrayList<ClassDecl> cdl = new ArrayList<ClassDecl>();
+	ClassDecl c;
+}
+{
+	(c = ClassDeclaration() { cdl.add(c); })*
+	{ return cdl.size() > 0 ? cdl : null; }
 }
 
-void ClassDeclaration():
-{}
+MainClass MainClass():
 {
-  < CLASS > < IDENTIFIER > ( < EXTENDS > < IDENTIFIER > )? < LBRACE > ( VarDeclaration() )* ( MethodDeclaration() )* < RBRACE >
+	Identifier id1,id2;
+	ArrayList<Statement> stms
+	
+}
+{
+  < CLASS > id1 = < IDENTIFIER > < LBRACE >
+  	< PUBLIC > < STATIC > < VOID > < MAIN > < LPAREN > < STRING > < LSQPAREN > < RSQPAREN > id2 = < IDENTIFIER > < RPAREN > < LBRACE >
+  		stms = Statement()
+  	< RBRACE >
+  < RBRACE >
+
+  {return new MainClass(id1,id2,stms);}
+}
+
+
+ClassDecl ClassDeclaration():
+{
+	Identifier id,ex;
+	ClassDecl cl;
+	VarDeclList vl = new VarDeclList();
+	MethodDeclList ml = new MethodDeclList();
+	VarDecl v;
+	MethodDecl m;
+}
+{
+  < CLASS > id = < IDENTIFIER > ( < EXTENDS > ex = < IDENTIFIER > )? < LBRACE > ( v = VarDeclaration() { vl.addElement(v); })* ( m = MethodDeclaration() { ml.addElement(m); })* < RBRACE >
+	{if(ex!=null) return new ClassDeclExtends(id,ex,vl,ml);
+	 return new ClassDeclSimple(id,vl,ml) }
+		
+	  
 }
 
 void VarDeclaration():
-{}
 {
-  Type() < IDENTIFIER > < SEMICOLON >
+	Type t;
+	Identifier id;
+}
+{
+  t = Type() id = < IDENTIFIER > < SEMICOLON >
+  {return new VarDecl(t,id);}
 }
 
 void MethodDeclaration():
-{}
 {
-  < PUBLIC > Type() < IDENTIFIER > < LPAREN > FormalList() < RPAREN > < LBRACE > ( LOOKAHEAD(2) VarDeclaration() )* ( Statement() )* < RETURN > Expression() < SEMICOLON > < RBRACE >
+  Type at;
+  Identifier ai;
+  FormalList afl;
+  VarDeclList avl;
+  VarDecl v;
+  StatementList asl,sl;
+  Exp ae;
+}
+{
+  < PUBLIC > at = Type() ai = < IDENTIFIER > < LPAREN > afl = FormalList() < RPAREN > < LBRACE > ( LOOKAHEAD(2) v = VarDeclaration() { avl.addElement(v);})* ( sl = Statement() {asl.joinAtEnd(sl);})* < RETURN > ae = Expression() < SEMICOLON > < RBRACE >
+  {return new MethodDeclaration(Type at, Identifier ai, FormalList afl, VarDeclList avl, 
+                    StatementList asl, Exp ae)}
 }
 
 void FormalList():
@@ -150,14 +199,19 @@ void Type():
 }
 
 void Statement():
-{}
-{ < LBRACE > ( Statement() )* < RBRACE >
-| < IF > < LPAREN > Expression() < RPAREN > Statement() < ELSE > Statement()
-| < WHILE > < LPAREN > Expression() < RPAREN > Statement()
-| < PRINT > < LPAREN > Expression() < RPAREN > < SEMICOLON >
-| < IDENTIFIER > ( < ASSIGN > Expression() < SEMICOLON >
-				 | < LSQPAREN > Expression() < RSQPAREN > < ASSIGN > Expression() < SEMICOLON >
+{
+  	StatementList s,ifStm,elseStm,stms = new StatementList();
+	Exp ae, aeI;
+	Identifier id;
+}
+{ < LBRACE > ( s = Statement() { stms.joinAtEnd(s); } )* < RBRACE >
+| < IF > < LPAREN > ae = Expression() < RPAREN > ifStm = Statement() < ELSE > elseStm = Statement() { stms.add(new If(ae,ifStm,elseStm)); }
+| < WHILE > < LPAREN > ae = Expression() < RPAREN > s = Statement() { stms.add(new While(ae,s));}
+| < PRINT > < LPAREN > ae = Expression() < RPAREN > < SEMICOLON > { stms.add(new Print(ae)); }
+| id = < IDENTIFIER > ( < ASSIGN > ae = Expression() < SEMICOLON > { stms.add(new Assign(id, ae)); }
+				 | < LSQPAREN > aeI = Expression() < RSQPAREN > < ASSIGN >  ae = Expression() < SEMICOLON > { stms.add(new ArrayAssign(id,aeI,ae)); }
 				 )
+	{return stms; }
 }
 
 void Expression():
