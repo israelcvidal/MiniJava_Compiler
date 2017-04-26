@@ -102,14 +102,14 @@ Program Program():
 	ClassDeclList cdl;
 }
 {
-  mc = MainClass()
-  cdl = ClassDeclList()
-  < EOF >
-  //TODO
+	mc = MainClass()
+  	cdl = ClassDeclList()
+  	< EOF >
+  	//TODO
   { return new Program(mc,cdl); }
 }
 
-ArrayList<ClassDecl> ClassDeclList() :
+ClassDeclList ClassDeclList() :
 {
   	ClassDeclList cdl = new ClassDeclList();
 	ClassDecl c;
@@ -126,13 +126,13 @@ MainClass MainClass():
 	Statement stm;
 }
 {
-  < CLASS > id1 = < IDENTIFIER > < LBRACE >
-  	< PUBLIC > < STATIC > < VOID > < MAIN > < LPAREN > < STRING > < LSQPAREN > < RSQPAREN > id2 = < IDENTIFIER > < RPAREN > < LBRACE >
-  		stm = Statement() {stml.joinAtEnd(stm);}
-  	< RBRACE >
-  < RBRACE >
+	< CLASS > id1 = < IDENTIFIER > < LBRACE >
+	< PUBLIC > < STATIC > < VOID > < MAIN > < LPAREN > < STRING > < LSQPAREN > < RSQPAREN > id2 = < IDENTIFIER > < RPAREN > < LBRACE >
+	stm = Statement() {stml.joinAtEnd(stm);}
+	< RBRACE >
+	< RBRACE >
 
-  {return new MainClass(id1,id2,stms);}
+	{return new MainClass(id1,id2,stms);}
 }
 
 
@@ -146,9 +146,11 @@ ClassDecl ClassDeclaration():
 	MethodDecl m;
 }
 {
-  < CLASS > id = < IDENTIFIER > ( < EXTENDS > ex = < IDENTIFIER > )? < LBRACE > ( v = VarDeclaration() { vl.addElement(v); })* ( m = MethodDeclaration() { ml.addElement(m); })* < RBRACE >
-	{if(ex!=null) return new ClassDeclExtends(id,ex,vl,ml);
-	 return new ClassDeclSimple(id,vl,ml); }
+	< CLASS > id = < IDENTIFIER > ( < EXTENDS > ex = < IDENTIFIER > )? < LBRACE > ( v = VarDeclaration() { vl.addElement(v); })* ( m = MethodDeclaration() { ml.addElement(m); })* < RBRACE >
+	{
+		if(ex!=null) return new ClassDeclExtends(id,ex,vl,ml);
+		return new ClassDeclSimple(id,vl,ml);
+	}
 		
 	  
 }
@@ -159,24 +161,23 @@ void VarDeclaration():
 	Identifier id;
 }
 {
-  t = Type() id = < IDENTIFIER > < SEMICOLON >
-  {return new VarDecl(t,id);}
+	t = Type() id = < IDENTIFIER > < SEMICOLON >
+	{return new VarDecl(t,id);}
 }
 
 MethodDeclaration MethodDeclaration():
 {
-  Type at;
-  Identifier ai;
-  FormalList afl;
-  VarDeclList avl;
-  VarDecl v;
-  StatementList asl,sl;
-  Exp ae;
+	Type at;
+	Identifier ai;
+	FormalList afl;
+	VarDeclList avl;
+	VarDecl v;
+	StatementList asl,sl;
+	Exp ae;
 }
 {
-  < PUBLIC > at = Type() ai = < IDENTIFIER > < LPAREN > afl = FormalList() < RPAREN > < LBRACE > ( LOOKAHEAD(2) v = VarDeclaration() { avl.addElement(v);})* ( sl = Statement() {asl.joinAtEnd(sl);})* < RETURN > ae = Expression() < SEMICOLON > < RBRACE >
-
-  {return new MethodDeclaration(at, ai, afl, avl, asl, ae);}
+	< PUBLIC > at = Type() ai = < IDENTIFIER > < LPAREN > afl = FormalList() < RPAREN > < LBRACE > ( LOOKAHEAD(2) v = VarDeclaration() { avl.addElement(v);})* ( sl = Statement() {asl.joinAtEnd(sl);})* < RETURN > ae = Expression() < SEMICOLON > < RBRACE >
+	{return new MethodDeclaration(at, ai, afl, avl, asl, ae);}
 }
 
 FormalList FormalList():
@@ -187,8 +188,8 @@ FormalList FormalList():
 	Identifier id;
 }
 {
-  t = Type() id = < IDENTIFIER > (f = FormalRest() {fl.addElement(f);})*
-  {return fl;}
+	t = Type() id = < IDENTIFIER > (f = FormalRest() {fl.addElement(f);})*
+	{return fl;}
 }
 
 Formal FormalRest():
@@ -197,14 +198,14 @@ Formal FormalRest():
 	Identifier id;
 }
 {
-  < COMMA > t = Type() id = < IDENTIFIER >
+	< COMMA > t = Type() id = < IDENTIFIER >
 
-  {return new Formal(t,id);}
+	{return new Formal(t,id);}
 }
 
 Type Type():
 {
-  IdentifierType it;
+	IdentifierType it;
 }
 { < INTEGER > {t = new IntegerType();} ( < LSQPAREN > < RSQPAREN > {t = new IntArrayType();})?
 | < BOOLEAN > {t = new BooleanType();}
@@ -213,7 +214,7 @@ Type Type():
 
 StatementList Statement():
 {
-  	StatementList s,ifStm,elseStm,stms = new StatementList();
+	StatementList s,ifStm,elseStm,stms = new StatementList();
 	Exp ae, aeI;
 	Identifier id;
 }
@@ -233,17 +234,18 @@ Exp Expression():
 	IntegerLiteral i;
 	Identifier id;
 }
-{ ( i = <INTEGER_LITERAL> {exp = new IntegerLiteral(i);}
-  | < TRUE > {exp = new True();}
-  | < FALSE > {exp = new False();}
-  | id = < IDENTIFIER > {exp = new IdentifierExp(id.toString());}
-  | < THIS > { exp = new This();}
-  | < NEW > ( < INTEGER > < LSQPAREN > exp = Expression() < RSQPAREN > {exp = new NewArray(exp);} | id = < IDENTIFIER > < LPAREN > < RPAREN > {exp = new NewObject(id);} )
-  | < NOT > exp = Expression() { exp = new Not(exp);}
-  | < LPAREN > exp = Expression() < RPAREN >
-  ) Expression_()
+{
+	( i = <INTEGER_LITERAL> {exp = new IntegerLiteral(i);}
+	| < TRUE > {exp = new True();}
+	| < FALSE > {exp = new False();}
+	| id = < IDENTIFIER > {exp = new IdentifierExp(id.toString());}
+	| < THIS > { exp = new This();}
+	| < NEW > ( < INTEGER > < LSQPAREN > exp = Expression() < RSQPAREN > {exp = new NewArray(exp);} | id = < IDENTIFIER > < LPAREN > < RPAREN > {exp = new NewObject(id);} )
+	| < NOT > exp = Expression() { exp = new Not(exp);}
+	| < LPAREN > exp = Expression() < RPAREN >
+	) Expression_()
 
-  {return exp;}
+	{return exp;}
 }
 
 Exp Expression_():
@@ -260,8 +262,8 @@ ExpList ExpList():
 	Exp exp;
 }
 {
-  exp = Expression() {expl.addElement(exp);} ( exp = ExpRest() {expl.addElement(exp);} )*
-  {return expl;}
+	exp = Expression() {expl.addElement(exp);} ( exp = ExpRest() {expl.addElement(exp);} )*
+	{return expl;}
 }
 
 Exp ExpRest():
@@ -269,8 +271,8 @@ Exp ExpRest():
 	Exp exp;
 }
 {
-  < COMMA > exp = Expression()
-  {return exp;}
+	< COMMA > exp = Expression()
+	{return exp;}
 }
 
 void MiniJavaToken():
