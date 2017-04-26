@@ -99,7 +99,7 @@ TOKEN: { //Reserved words
 Program Program():
 {
 	MainClass mc;
-	ArrayList<ClassDecl> cdl;
+	ClassDeclList cdl;
 }
 {
   mc = MainClass()
@@ -111,24 +111,24 @@ Program Program():
 
 ArrayList<ClassDecl> ClassDeclList() :
 {
-  	ArrayList<ClassDecl> cdl = new ArrayList<ClassDecl>();
+  	ClassDeclList cdl = new ClassDeclList();
 	ClassDecl c;
 }
 {
-	(c = ClassDeclaration() { cdl.add(c); })*
+	(c = ClassDeclaration() { cdl.addElement(c); })*
 	{ return cdl.size() > 0 ? cdl : null; }
 }
 
 MainClass MainClass():
 {
 	Identifier id1,id2;
-	ArrayList<Statement> stms
-	
+	StatementList stml = new StatementList();
+	Statement stm;
 }
 {
   < CLASS > id1 = < IDENTIFIER > < LBRACE >
   	< PUBLIC > < STATIC > < VOID > < MAIN > < LPAREN > < STRING > < LSQPAREN > < RSQPAREN > id2 = < IDENTIFIER > < RPAREN > < LBRACE >
-  		stms = Statement()
+  		stm = Statement() {stml.joinAtEnd(stm);}
   	< RBRACE >
   < RBRACE >
 
@@ -148,7 +148,7 @@ ClassDecl ClassDeclaration():
 {
   < CLASS > id = < IDENTIFIER > ( < EXTENDS > ex = < IDENTIFIER > )? < LBRACE > ( v = VarDeclaration() { vl.addElement(v); })* ( m = MethodDeclaration() { ml.addElement(m); })* < RBRACE >
 	{if(ex!=null) return new ClassDeclExtends(id,ex,vl,ml);
-	 return new ClassDeclSimple(id,vl,ml) }
+	 return new ClassDeclSimple(id,vl,ml); }
 		
 	  
 }
@@ -175,8 +175,8 @@ MethodDeclaration MethodDeclaration():
 }
 {
   < PUBLIC > at = Type() ai = < IDENTIFIER > < LPAREN > afl = FormalList() < RPAREN > < LBRACE > ( LOOKAHEAD(2) v = VarDeclaration() { avl.addElement(v);})* ( sl = Statement() {asl.joinAtEnd(sl);})* < RETURN > ae = Expression() < SEMICOLON > < RBRACE >
-  {return new MethodDeclaration(Type at, Identifier ai, FormalList afl, VarDeclList avl, 
-                    StatementList asl, Exp ae)}
+
+  {return new MethodDeclaration(at, ai, afl, avl, asl, ae);}
 }
 
 FormalList FormalList():
