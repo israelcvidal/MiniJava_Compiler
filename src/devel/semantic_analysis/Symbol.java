@@ -3,6 +3,12 @@ package devel.semantic_analysis;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The class implements a manner more optimized to deal with identifier. 
+ * @author daniel
+ *
+ */
+
 public class Symbol {
 	private static Map<String,Symbol> dict = new HashMap<String,Symbol>();
 	private String name;
