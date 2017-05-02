@@ -1,5 +1,7 @@
 package devel.semantic_analysis;
 
+import java.util.Enumeration;
+
 /**
  * The class implements a overall environment for a MiniJava Program.
  * @author daniel
@@ -15,5 +17,19 @@ public class ProgramTable {
 	
 	public ClassTable getClass(Symbol key) {
 		return classTable.get(key);
-	}	
+	}
+	
+	public Enumeration<Symbol> keys() {
+		return classTable.keys();
+	}
+	
+	public void print() {
+	   for (Enumeration<Symbol> iterator = classTable.keys(); iterator.hasMoreElements();) {
+		   Symbol s = iterator.nextElement();
+		   System.out.println(s.toString());
+		   ClassTable ct = classTable.get(s);
+		   ct.print();
+	   }
+	}
+	
 }

@@ -190,7 +190,7 @@ FormalList FormalList():
 	Identifier id;
 }
 {
-	(	  t = Type() id = Identifier() (f = FormalRest() {fl.addElement(f);})*
+	(	  t = Type() id = Identifier() { fl.addElement(new Formal(t,id)); } (f = FormalRest() {fl.addElement(f);})*
 	)
 	
 	{ return fl; }

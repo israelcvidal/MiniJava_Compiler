@@ -16,7 +16,7 @@ public class Table<T> {
 	private Map<Symbol, T> bindings = new LinkedHashMap<>();
 	
 	public void put(Symbol key, T value) throws SemanticErrorException {
-		if (bindings.containsKey(key))
+		if (key == null || bindings.containsKey(key))
 			throw new SemanticErrorException(key.toString()+" already defined!");
 		
 		bindings.put(key, value);

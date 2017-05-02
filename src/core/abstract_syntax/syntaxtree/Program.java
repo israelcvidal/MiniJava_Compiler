@@ -1,6 +1,8 @@
 package core.abstract_syntax.syntaxtree;
 
 import core.abstract_syntax.visitor.Visitor;
+import devel.semantic_analysis.ProgramTable;
+import devel.semantic_analysis.TypeCheckVisitor;
 import core.abstract_syntax.visitor.TypeVisitor;
 
 public class Program {
@@ -17,5 +19,9 @@ public class Program {
 
   public Type accept(TypeVisitor v) {
     return v.visit(this);
+  }
+  
+  public ProgramTable accept(TypeCheckVisitor v) {
+	  return v.visit(this);
   }
 }

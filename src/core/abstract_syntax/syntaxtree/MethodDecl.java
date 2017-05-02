@@ -1,6 +1,8 @@
 package core.abstract_syntax.syntaxtree;
 
 import core.abstract_syntax.visitor.Visitor;
+import devel.semantic_analysis.MethodTable;
+import devel.semantic_analysis.TypeCheckVisitor;
 import core.abstract_syntax.visitor.TypeVisitor;
 
 public class MethodDecl {
@@ -22,5 +24,9 @@ public class MethodDecl {
 
   public Type accept(TypeVisitor v) {
     return v.visit(this);
+  }
+  
+  public MethodTable accept(TypeCheckVisitor v) {
+	  return v.visit(this);
   }
 }

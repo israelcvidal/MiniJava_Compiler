@@ -6,7 +6,7 @@ class Factorial {
 }
 
 class Fac {
-	public int ComputeFac(int num) {
+	public int ComputeFac(int num, int num2) {
 		int num_aux;
 
 		if (num < 1)
@@ -16,4 +16,8 @@ class Fac {
 
 		return num_aux;
 	}
+}
+
+class Test {
+
 }

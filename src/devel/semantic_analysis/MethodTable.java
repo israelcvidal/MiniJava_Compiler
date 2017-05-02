@@ -1,5 +1,7 @@
 package devel.semantic_analysis;
 
+import java.util.Enumeration;
+
 import core.abstract_syntax.syntaxtree.Type;
 
 /**
@@ -9,15 +11,20 @@ import core.abstract_syntax.syntaxtree.Type;
  */
 
 public class MethodTable {
+	private Type returnType;
 	private TypeTable localTypeTable = new TypeTable();
-	private TypeTable paramTypeTable = new TypeTable();
+	private TypeTable formalTypeTable = new TypeTable();
+	
+	public MethodTable(Type returnType) {
+		this.returnType = returnType;
+	}
 	
 	public void putLocal(Symbol key, Type value) throws SemanticErrorException {
 		localTypeTable.put(key, value);
 	}
 	
 	public void putFormal(Symbol key, Type value) throws SemanticErrorException {
-		paramTypeTable.put(key, value);
+		formalTypeTable.put(key, value);
 	}
 	
 	public Type getLocal(Symbol key) {
@@ -25,7 +32,33 @@ public class MethodTable {
 	}
 
 	public Type getFormal(Symbol key) {
-		return paramTypeTable.get(key);
+		return formalTypeTable.get(key);
+	}
+	
+	public Type getReturnType() {
+		return returnType;
+	}
+	
+	public Enumeration<Symbol> localKeys() {
+		return localTypeTable.keys();
+	}
+	
+	public Enumeration<Symbol> formalKeys() {
+		return formalTypeTable.keys();
+	}
+	
+	public void print() {
+		   for (Enumeration<Symbol> iterator = localTypeTable.keys(); iterator.hasMoreElements();) {
+			   Symbol s = iterator.nextElement();
+			   //System.out.println(s.toString() + "Type: " + localTypeTable.get(s).toString());
+			   System.out.println(s.toString());
+		   }
+		   
+		   for (Enumeration<Symbol> iterator = formalTypeTable.keys(); iterator.hasMoreElements();) {
+			   Symbol s = iterator.nextElement();
+			   //System.out.println(s.toString() + "Type: " + formalTypeTable.get(s).toString());
+			   System.out.println(s.toString());
+		   }
 	}
 	
 }
