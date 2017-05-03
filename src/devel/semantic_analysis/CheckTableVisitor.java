@@ -175,22 +175,36 @@ public class CheckTableVisitor implements TypeVisitor{
 	public Type visit(Assign n) {
 		Type expType = n.e.accept(this);
 		
-		Type identifierType = this.currenMethod.getLocal(Symbol.symbol(n.i.s));
+		Type idType = this.currenMethod.getLocal(Symbol.symbol(n.i.s));
 		try{
 			
-			if(identifierType == null){
-				identifierType = this.currenMethod.getFormal(Symbol.symbol(n.i.s));
-				if(identifierType == null){
-					identifierType = this.currenClass.getField(Symbol.symbol(n.i.s));
-					if(identifierType == null){
+			if(idType == null){
+				idType = this.currenMethod.getFormal(Symbol.symbol(n.i.s));
+				if(idType == null){
+					idType = this.currenClass.getField(Symbol.symbol(n.i.s));
+					if(idType == null){
 						throw new SemanticErrorException("id '" + n.i.s + "' does not exist");
 					}
 				}
 			}
 			
-			if( (identifierType instanceof IntegerType) && (expType instanceof IntegerType) ){
-				
+			if( (idType instanceof IntegerType) && (expType instanceof IntegerType) ){
+				return new IntegerType();
 			}
+
+			if( (idType instanceof BooleanType) && (expType instanceof BooleanType) ){
+				return new BooleanType();
+			}
+			
+			if( (idType instanceof IntArrayType) && (expType instanceof IntArrayType) ){
+				return new IntArrayType();
+			}
+		
+//			if( (idType instanceof IdentifierType) && (expType instanceof IdentifierType) ){
+//				
+//			}
+			
+			throw new SemanticErrorException(n.i.s + " and " + n.e + " must have same type to assign");
 			
 		} catch(SemanticErrorException see){
 			see.printStackTrace();
