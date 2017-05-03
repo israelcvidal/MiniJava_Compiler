@@ -123,23 +123,37 @@ public class CheckTableVisitor implements TypeVisitor{
 	}
 	@Override
 	public Type visit(IntArrayType n) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return new IntArrayType();
 	}
 	@Override
 	public Type visit(BooleanType n) {
-		// TODO Auto-generated method stub
-		return null;
+
+		return new BooleanType();
 	}
 	@Override
 	public Type visit(IntegerType n) {
-		// TODO Auto-generated method stub
-		return null;
+	
+		return new IntegerType();
 	}
 	@Override
 	public Type visit(IdentifierType n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type idType = null;
+		try{
+			idType = this.currenMethod.getLocal(Symbol.symbol(n.s));
+			if(idType == null){
+				idType = this.currenMethod.getFormal(Symbol.symbol(n.s));
+				if(idType == null){
+					idType = this.currenClass.getField(Symbol.symbol(n.s));
+					if(idType == null){
+						throw new SemanticErrorException("id '" + n.s + "' does not exist");
+					}
+				}
+			}
+		}catch(SemanticErrorException see){
+			see.printStackTrace();
+		}
+		return idType;
 	}
 	@Override
 	public Type visit(Block n) {
@@ -174,38 +188,18 @@ public class CheckTableVisitor implements TypeVisitor{
 	@Override
 	public Type visit(Assign n) {
 		Type expType = n.e.accept(this);
+		Type idType = n.i.accept(this);
 		
-		Type idType = this.currenMethod.getLocal(Symbol.symbol(n.i.s));
 		try{
-			
-			if(idType == null){
-				idType = this.currenMethod.getFormal(Symbol.symbol(n.i.s));
-				if(idType == null){
-					idType = this.currenClass.getField(Symbol.symbol(n.i.s));
-					if(idType == null){
-						throw new SemanticErrorException("id '" + n.i.s + "' does not exist");
+				
+			if( !((idType instanceof IntegerType) && (expType instanceof IntegerType)) ){
+				if( !((idType instanceof BooleanType) && (expType instanceof BooleanType)) ){
+					if( !((idType instanceof IntArrayType) && (expType instanceof IntArrayType)) ){
+						throw new SemanticErrorException(n.i.s + " and " + n.e + " must have same type to assign");
 					}
 				}
 			}
-			
-			if( (idType instanceof IntegerType) && (expType instanceof IntegerType) ){
-				return new IntegerType();
-			}
-
-			if( (idType instanceof BooleanType) && (expType instanceof BooleanType) ){
-				return new BooleanType();
-			}
-			
-			if( (idType instanceof IntArrayType) && (expType instanceof IntArrayType) ){
-				return new IntArrayType();
-			}
 		
-//			if( (idType instanceof IdentifierType) && (expType instanceof IdentifierType) ){
-//				
-//			}
-			
-			throw new SemanticErrorException(n.i.s + " and " + n.e + " must have same type to assign");
-			
 		} catch(SemanticErrorException see){
 			see.printStackTrace();
 		}
@@ -213,43 +207,159 @@ public class CheckTableVisitor implements TypeVisitor{
 	}
 	@Override
 	public Type visit(ArrayAssign n) {
-		// TODO Auto-generated method stub
+		Type idType = n.i.accept(this);
+		Type exp1Type = n.e1.accept(this);
+		Type exp2Type = n.e2.accept(this);
+		
+		try{
+			if(!(idType instanceof IntArrayType)){
+				throw new SemanticErrorException(n.i.s + "must be IntArrayType");
+			}
+			if( !(exp1Type instanceof IntegerType)){
+				throw new SemanticErrorException(n.e1 + "must be IntType");
+			}
+			
+			if (!(exp2Type instanceof IntegerType) ){
+				throw new SemanticErrorException(n.e2 + "must be IntType");
+			}
+						
+		} catch(SemanticErrorException see){
+			see.printStackTrace();
+		}
 		return null;
 	}
 	@Override
 	public Type visit(And n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type exp1Type = n.e1.accept(this);
+		Type exp2Type = n.e2.accept(this);
+		
+		try{
+			if(!(exp1Type instanceof BooleanType)){
+				throw new SemanticErrorException(n.e1 + "must be BooleanType");
+			}
+			
+			if(!(exp2Type instanceof BooleanType)){
+				throw new SemanticErrorException(n.e2 + "must be BooleanType");
+			}
+			
+		}catch(SemanticErrorException see){
+			see.printStackTrace();
+		}
+		
+		return new BooleanType();
 	}
 	@Override
 	public Type visit(LessThan n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type exp1Type = n.e1.accept(this);
+		Type exp2Type = n.e2.accept(this);
+		
+		try{
+			if(!(exp1Type instanceof IntegerType)){
+				throw new SemanticErrorException(n.e1 + "must be IntegerType");
+			}
+			
+			if(!(exp2Type instanceof IntegerType)){
+				throw new SemanticErrorException(n.e2 + "must be IntegerType");
+			}
+			
+		}catch(SemanticErrorException see){
+			see.printStackTrace();
+		}
+		
+		return new BooleanType();
 	}
 	@Override
 	public Type visit(Plus n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type exp1Type = n.e1.accept(this);
+		Type exp2Type = n.e2.accept(this);
+		
+		try{
+			if(!(exp1Type instanceof IntegerType)){
+				throw new SemanticErrorException(n.e1 + "must be IntegerType");
+			}
+			
+			if(!(exp2Type instanceof IntegerType)){
+				throw new SemanticErrorException(n.e2 + "must be IntegerType");
+			}
+			
+		}catch(SemanticErrorException see){
+			see.printStackTrace();
+		}
+		
+		return new IntegerType();
 	}
 	@Override
 	public Type visit(Minus n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type exp1Type = n.e1.accept(this);
+		Type exp2Type = n.e2.accept(this);
+		
+		try{
+			if(!(exp1Type instanceof IntegerType)){
+				throw new SemanticErrorException(n.e1 + "must be IntegerType");
+			}
+			
+			if(!(exp2Type instanceof IntegerType)){
+				throw new SemanticErrorException(n.e2 + "must be IntegerType");
+			}
+			
+		}catch(SemanticErrorException see){
+			see.printStackTrace();
+		}
+		
+		return new IntegerType();
 	}
 	@Override
 	public Type visit(Times n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type exp1Type = n.e1.accept(this);
+		Type exp2Type = n.e2.accept(this);
+		
+		try{
+			if(!(exp1Type instanceof IntegerType)){
+				throw new SemanticErrorException(n.e1 + "must be IntegerType");
+			}
+			
+			if(!(exp2Type instanceof IntegerType)){
+				throw new SemanticErrorException(n.e2 + "must be IntegerType");
+			}
+			
+		}catch(SemanticErrorException see){
+			see.printStackTrace();
+		}
+		
+		return new IntegerType();
 	}
 	@Override
 	public Type visit(ArrayLookup n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type exp1Type = n.e1.accept(this);
+		Type exp2Type = n.e2.accept(this);
+		
+		try{
+			if(!(exp1Type instanceof IntArrayType)){
+				throw new SemanticErrorException(n.e1 + "must be IntArrayType");
+			}
+			if(!(exp2Type instanceof IntegerType)){
+				throw new SemanticErrorException(n.e2 + "must be IntegerType");
+			}
+
+			
+		}catch(SemanticErrorException see){
+			see.printStackTrace();
+		}
+
+		return new IntegerType();
 	}
 	@Override
 	public Type visit(ArrayLength n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type expType = n.e.accept(this);
+		
+		try{
+			if( !(expType instanceof IntArrayType)){
+				throw new SemanticErrorException(n.e + "must be IntArrayType");
+			}
+		}catch(SemanticErrorException see){
+			see.printStackTrace();
+		}
+		return new IntegerType();
 	}
 	@Override
 	public Type visit(Call n) {
@@ -258,23 +368,37 @@ public class CheckTableVisitor implements TypeVisitor{
 	}
 	@Override
 	public Type visit(IntegerLiteral n) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return new IntegerType();
 	}
 	@Override
 	public Type visit(True n) {
-		// TODO Auto-generated method stub
-		return null;
+
+		return new BooleanType();
 	}
 	@Override
 	public Type visit(False n) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return new BooleanType();
 	}
 	@Override
 	public Type visit(IdentifierExp n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type idType = null;
+		try{
+			idType = this.currenMethod.getLocal(Symbol.symbol(n.s));
+			if(idType == null){
+				idType = this.currenMethod.getFormal(Symbol.symbol(n.s));
+				if(idType == null){
+					idType = this.currenClass.getField(Symbol.symbol(n.s));
+					if(idType == null){
+						throw new SemanticErrorException("id '" + n.s + "' does not exist");
+					}
+				}
+			}
+		}catch(SemanticErrorException see){
+			see.printStackTrace();
+		}
+		return idType;
 	}
 	@Override
 	public Type visit(This n) {
