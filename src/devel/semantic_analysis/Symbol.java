@@ -19,9 +19,9 @@ public class Symbol {
 
 	public static Symbol symbol(String n) {
 		String u = n.intern();
-		Symbol s = null;
+		Symbol s = dict.get(u);
 		
-		if (!dict.containsKey(u)) {
+		if (s==null) {
 			s = new Symbol(u);
 			dict.put(u,s);
 		}

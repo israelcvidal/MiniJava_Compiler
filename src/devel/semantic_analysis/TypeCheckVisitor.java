@@ -37,13 +37,13 @@ import core.abstract_syntax.syntaxtree.VarDecl;
 import core.abstract_syntax.syntaxtree.While;
 
 public interface TypeCheckVisitor {
-  public ProgramTable visit(Program n);
-  public ClassTable visit(MainClass n);
-  public ClassTable visit(ClassDeclSimple n);
-  public ClassTable visit(ClassDeclExtends n);
-  public Type visit(VarDecl n);
-  public MethodTable visit(MethodDecl n);
-  public Type visit(Formal n);
+	public ProgramTable visit(Program n);
+	public ClassTable visit(MainClass n);
+	public ClassTable visit(ClassDeclSimple n);
+	public ClassTable visit(ClassDeclExtends n);
+	public Type visit(VarDecl n);
+	public MethodTable visit(MethodDecl n);
+	public Type visit(Formal n);
 //  public Type visit(IntArrayType n);
 //  public Type visit(BooleanType n);
 //  public Type visit(IntegerType n);
