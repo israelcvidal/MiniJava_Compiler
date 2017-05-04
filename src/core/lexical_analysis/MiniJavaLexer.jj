@@ -210,11 +210,12 @@ Formal FormalRest():
 
 Type Type():
 {
+  	Identifier id;
 	Type t;
 }
 { ( < INTEGER > {t = new IntegerType();} ( < LSQPAREN > < RSQPAREN > {t = new IntArrayType();})?
   | < BOOLEAN > {t = new BooleanType();}
-  | Identifier() {t = new IntegerType();}
+  | id = Identifier() {t = new IdentifierType(id.s);}
   )
   
   { return t; }

@@ -27,11 +27,11 @@ public class MethodTable {
 		formalTypeTable.put(key, value);
 	}
 	
-	public Type getLocal(Symbol key) {
+	public Type getLocal(Symbol key) throws SemanticErrorException {
 		return localTypeTable.get(key);
 	}
 
-	public Type getFormal(Symbol key) {
+	public Type getFormal(Symbol key) throws SemanticErrorException {
 		return formalTypeTable.get(key);
 	}
 	
@@ -45,6 +45,14 @@ public class MethodTable {
 	
 	public Enumeration<Symbol> formalKeys() {
 		return formalTypeTable.keys();
+	}
+
+	public int sizeLocal() {
+		return formalTypeTable.size();
+	}
+	
+	public int sizeFormal() {
+		return formalTypeTable.size();
 	}
 	
 	public void print() {

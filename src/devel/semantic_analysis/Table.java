@@ -22,11 +22,21 @@ public class Table<T> {
 		bindings.put(key, value);
 	}
 	
-	public T get(Symbol key) {
-		return bindings.get(key);
+	public T get(Symbol key) throws SemanticErrorException {
+		T result = bindings.get(key);
+		
+		if (result == null)
+			throw new SemanticErrorException(key.toString()+" not defined!");
+		
+		return result;
 	}
 	
 	public Enumeration<Symbol> keys() {
 		return Collections.enumeration(bindings.keySet());
 	}
+	
+	public int size() {
+		return bindings.size();
+	}
+	
 }

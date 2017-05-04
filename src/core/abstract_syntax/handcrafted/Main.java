@@ -11,6 +11,7 @@ import core.abstract_syntax.visitor.*;
 import core.lexical_analysis.MiniJavaParser;
 import core.lexical_analysis.ParseException;
 import devel.semantic_analysis.BuildTableVisitor;
+import devel.semantic_analysis.CheckTableVisitor;
 import devel.semantic_analysis.ProgramTable;
 import devel.semantic_analysis.Symbol;
 
@@ -27,7 +28,9 @@ public class Main {
 		   
 		   ProgramTable pt = root.accept(new BuildTableVisitor());
 		   
-		   pt.print();
+		   root.accept(new CheckTableVisitor(pt));
+		   
+		   //pt.print();
 		   
 	   	} catch (ParseException e) {
 	   		System.out.println(e.toString());

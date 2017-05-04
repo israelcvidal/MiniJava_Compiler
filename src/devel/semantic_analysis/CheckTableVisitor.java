@@ -1,6 +1,6 @@
 package devel.semantic_analysis;
 
-import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
+import java.util.Enumeration;
 
 import core.abstract_syntax.syntaxtree.And;
 import core.abstract_syntax.syntaxtree.ArrayAssign;
@@ -13,7 +13,6 @@ import core.abstract_syntax.syntaxtree.Call;
 import core.abstract_syntax.syntaxtree.ClassDecl;
 import core.abstract_syntax.syntaxtree.ClassDeclExtends;
 import core.abstract_syntax.syntaxtree.ClassDeclSimple;
-import core.abstract_syntax.syntaxtree.Exp;
 import core.abstract_syntax.syntaxtree.False;
 import core.abstract_syntax.syntaxtree.Formal;
 import core.abstract_syntax.syntaxtree.Identifier;
@@ -41,7 +40,6 @@ import core.abstract_syntax.syntaxtree.Type;
 import core.abstract_syntax.syntaxtree.VarDecl;
 import core.abstract_syntax.syntaxtree.While;
 import core.abstract_syntax.visitor.TypeVisitor;
-import core.abstract_syntax.visitor.Visitor;
 
 /**
  * This class checks the table built by BuildTableVisitor in order to check if variables and methods used were declared and
@@ -49,11 +47,11 @@ import core.abstract_syntax.visitor.Visitor;
  * @author Israel
  */
 
-public class CheckTableVisitor implements TypeVisitor{
+public class CheckTableVisitor implements TypeVisitor {
 	private ProgramTable programTable;
-	private ClassTable currenClass=null;
-	private MethodTable currenMethod=null;
-//	private MethodTable currenMethod=null;
+	private ClassTable currenClass = null;
+	private MethodTable currenMethod = null;
+
 	public CheckTableVisitor(ProgramTable pt) {
 		this.programTable = pt;
 		
@@ -71,16 +69,31 @@ public class CheckTableVisitor implements TypeVisitor{
 	}
 	@Override
 	public Type visit(MainClass n) {
-		this.currenClass = this.programTable.getClass(Symbol.symbol(n.i1.s));
-		n.s.accept(this);
+		try {
+			
+			this.currenClass = this.programTable.getClass(Symbol.symbol(n.i1.s));
+			n.s.accept(this);
+			
+		} catch (SemanticErrorException see) {
+			see.printStackTrace();
+		}
 	
 		return null;
 	}
 	
 	@Override
 	public Type visit(ClassDeclSimple n) {
-		this.currenClass = this.programTable.getClass(Symbol.symbol(n.i.s));
+		try {
+			this.currenClass = this.programTable.getClass(Symbol.symbol(n.i.s));
+		} catch (SemanticErrorException see) {
+			see.printStackTrace();
+		}
 
+		for (int i = 0; i < n.vl.size(); i++) {
+			VarDecl vd = n.vl.elementAt(i);
+			vd.accept(this);
+		}
+		
 		for (int i = 0; i < n.ml.size(); i++) {
 			MethodDecl md = n.ml.elementAt(i);
 			md.accept(this);
@@ -90,7 +103,21 @@ public class CheckTableVisitor implements TypeVisitor{
 	}
 	@Override
 	public Type visit(ClassDeclExtends n) {
-		this.currenClass = this.programTable.getClass(Symbol.symbol(n.i.s));
+		try {
+			if(n.i.s.equals(n.j.s))
+				throw new SemanticErrorException("cyclic inheritance involving " + n.i.s);
+						
+			this.currenClass = this.programTable.getClass(Symbol.symbol(n.i.s));
+			
+//			this.programTable.getClass(Symbol.symbol(n.j.s));
+		} catch (SemanticErrorException see) {
+			see.printStackTrace();
+		}
+		
+		for (int i = 0; i < n.vl.size(); i++) {
+			VarDecl vd = n.vl.elementAt(i);
+			vd.accept(this);
+		}
 		
 		for (int i = 0; i < n.ml.size(); i++) {
 			MethodDecl md = n.ml.elementAt(i);
@@ -101,59 +128,70 @@ public class CheckTableVisitor implements TypeVisitor{
 	}
 	@Override
 	public Type visit(VarDecl n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type result = null;
+		
+		try {
+			result = currenMethod.getFormal(Symbol.symbol(n.i.s));
+			
+			try {
+				if (result == null)
+					throw new SemanticErrorException(n.i.s + " already defined!");
+			} catch (SemanticErrorException see) {
+				see.printStackTrace();
+			}
+			
+		} catch (SemanticErrorException see) { }
+		
+		return result;
 	}
 	@Override
 	public Type visit(MethodDecl n) {
-		this.currenMethod = this.currenClass.getMethod(Symbol.symbol(n.i.toString()));
+		try {
+			this.currenMethod = this.currenClass.getMethod(Symbol.symbol(n.i.toString()));
+			
+			Type expType = n.e.accept(this);
+			
+			if (!expType.getClass().equals(currenMethod.getReturnType().getClass()))
+				throw new SemanticErrorException("Return type mismatch error in " + n.i.s);
+			
+		} catch (SemanticErrorException see) {
+			see.printStackTrace();
+		}
+		
+		for (int i = 0; i < n.vl.size(); i++) {
+			VarDecl vd = n.vl.elementAt(i);
+			vd.accept(this);
+		}
 		
 		for (int i = 0; i < n.sl.size(); i++) {
 			Statement st = n.sl.elementAt(i);
 			st.accept(this);
 		}
-		n.e.accept(this);
 		
 		return null;
 	}
 	@Override
 	public Type visit(Formal n) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public Type visit(IntArrayType n) {
 		
-		return new IntArrayType();
+		return n;
 	}
 	@Override
 	public Type visit(BooleanType n) {
 
-		return new BooleanType();
+		return n;
 	}
 	@Override
 	public Type visit(IntegerType n) {
 	
-		return new IntegerType();
+		return n;
 	}
 	@Override
 	public Type visit(IdentifierType n) {
-		Type idType = null;
-		try{
-			idType = this.currenMethod.getLocal(Symbol.symbol(n.s));
-			if(idType == null){
-				idType = this.currenMethod.getFormal(Symbol.symbol(n.s));
-				if(idType == null){
-					idType = this.currenClass.getField(Symbol.symbol(n.s));
-					if(idType == null){
-						throw new SemanticErrorException("id '" + n.s + "' does not exist");
-					}
-				}
-			}
-		}catch(SemanticErrorException see){
-			see.printStackTrace();
-		}
-		return idType;
+		return n;
 	}
 	@Override
 	public Type visit(Block n) {
@@ -166,15 +204,33 @@ public class CheckTableVisitor implements TypeVisitor{
 	}
 	@Override
 	public Type visit(If n) {
-		n.e.accept(this);
+		Type expType = n.e.accept(this);
+		
+		try {
+			if (!(expType instanceof BooleanType))
+				//TODO
+				throw new SemanticErrorException(" must be a boolean.");
+		} catch (SemanticErrorException see) {
+			see.printStackTrace();
+		}
+
 		n.s1.accept(this);
 		n.s2.accept(this);
-
+		
 		return null;
 	}
 	@Override
 	public Type visit(While n) {
-		n.e.accept(this);
+		Type expType = n.e.accept(this);
+		
+		try {
+			if (!(expType instanceof BooleanType))
+				//TODO
+				throw new SemanticErrorException(" must be a boolean.");
+		} catch (SemanticErrorException see) {
+			see.printStackTrace();
+		}
+		
 		n.s.accept(this);
 		
 		return null;
@@ -192,10 +248,14 @@ public class CheckTableVisitor implements TypeVisitor{
 		
 		try{
 				
-			if( !((idType instanceof IntegerType) && (expType instanceof IntegerType)) ){
-				if( !((idType instanceof BooleanType) && (expType instanceof BooleanType)) ){
-					if( !((idType instanceof IntArrayType) && (expType instanceof IntArrayType)) ){
-						throw new SemanticErrorException(n.i.s + " and " + n.e + " must have same type to assign");
+			if( !((idType instanceof IntegerType) && (expType instanceof IntegerType)) ) {
+				if( !((idType instanceof BooleanType) && (expType instanceof BooleanType)) ) {
+					if( !((idType instanceof IntArrayType) && (expType instanceof IntArrayType)) ) {					
+						if ( !((idType instanceof IdentifierType) && (expType instanceof IdentifierType)) ) {
+							throw new SemanticErrorException(n.i.s + " and " + expType.toString() + " must have same type to assign");
+						} else if (! (((IdentifierType)idType).s.equals(((IdentifierType) expType).s)) ) {
+							throw new SemanticErrorException(n.i.s + " and " + expType.toString() + " must have same type to assign");
+						}
 					}
 				}
 			}
@@ -213,14 +273,14 @@ public class CheckTableVisitor implements TypeVisitor{
 		
 		try{
 			if(!(idType instanceof IntArrayType)){
-				throw new SemanticErrorException(n.i.s + "must be IntArrayType");
+				throw new SemanticErrorException(n.i.s + " must be IntArrayType");
 			}
 			if( !(exp1Type instanceof IntegerType)){
-				throw new SemanticErrorException(n.e1 + "must be IntType");
+				throw new SemanticErrorException(n.e1.toString() + " must be IntType");
 			}
 			
 			if (!(exp2Type instanceof IntegerType) ){
-				throw new SemanticErrorException(n.e2 + "must be IntType");
+				throw new SemanticErrorException(n.e2.toString() + " must be IntType");
 			}
 						
 		} catch(SemanticErrorException see){
@@ -235,11 +295,11 @@ public class CheckTableVisitor implements TypeVisitor{
 		
 		try{
 			if(!(exp1Type instanceof BooleanType)){
-				throw new SemanticErrorException(n.e1 + "must be BooleanType");
+				throw new SemanticErrorException(n.e1.toString() + " must be BooleanType");
 			}
 			
 			if(!(exp2Type instanceof BooleanType)){
-				throw new SemanticErrorException(n.e2 + "must be BooleanType");
+				throw new SemanticErrorException(n.e2.toString() + " must be BooleanType");
 			}
 			
 		}catch(SemanticErrorException see){
@@ -255,11 +315,11 @@ public class CheckTableVisitor implements TypeVisitor{
 		
 		try{
 			if(!(exp1Type instanceof IntegerType)){
-				throw new SemanticErrorException(n.e1 + "must be IntegerType");
+				throw new SemanticErrorException(n.e1.toString() + " must be IntegerType");
 			}
 			
 			if(!(exp2Type instanceof IntegerType)){
-				throw new SemanticErrorException(n.e2 + "must be IntegerType");
+				throw new SemanticErrorException(n.e2.toString() + " must be IntegerType");
 			}
 			
 		}catch(SemanticErrorException see){
@@ -275,11 +335,11 @@ public class CheckTableVisitor implements TypeVisitor{
 		
 		try{
 			if(!(exp1Type instanceof IntegerType)){
-				throw new SemanticErrorException(n.e1 + "must be IntegerType");
+				throw new SemanticErrorException(n.e1.toString() + " must be IntegerType");
 			}
 			
 			if(!(exp2Type instanceof IntegerType)){
-				throw new SemanticErrorException(n.e2 + "must be IntegerType");
+				throw new SemanticErrorException(n.e2.toString() + " must be IntegerType");
 			}
 			
 		}catch(SemanticErrorException see){
@@ -295,11 +355,11 @@ public class CheckTableVisitor implements TypeVisitor{
 		
 		try{
 			if(!(exp1Type instanceof IntegerType)){
-				throw new SemanticErrorException(n.e1 + "must be IntegerType");
+				throw new SemanticErrorException(n.e1.toString() + " must be IntegerType");
 			}
 			
 			if(!(exp2Type instanceof IntegerType)){
-				throw new SemanticErrorException(n.e2 + "must be IntegerType");
+				throw new SemanticErrorException(n.e2.toString() + " must be IntegerType");
 			}
 			
 		}catch(SemanticErrorException see){
@@ -315,11 +375,11 @@ public class CheckTableVisitor implements TypeVisitor{
 		
 		try{
 			if(!(exp1Type instanceof IntegerType)){
-				throw new SemanticErrorException(n.e1 + "must be IntegerType");
+				throw new SemanticErrorException(exp1Type.toString() + " must be IntegerType");
 			}
 			
 			if(!(exp2Type instanceof IntegerType)){
-				throw new SemanticErrorException(n.e2 + "must be IntegerType");
+				throw new SemanticErrorException(exp2Type.toString() + " must be IntegerType");
 			}
 			
 		}catch(SemanticErrorException see){
@@ -335,10 +395,10 @@ public class CheckTableVisitor implements TypeVisitor{
 		
 		try{
 			if(!(exp1Type instanceof IntArrayType)){
-				throw new SemanticErrorException(n.e1 + "must be IntArrayType");
+				throw new SemanticErrorException(n.e1.toString() + "must be IntArrayType");
 			}
 			if(!(exp2Type instanceof IntegerType)){
-				throw new SemanticErrorException(n.e2 + "must be IntegerType");
+				throw new SemanticErrorException(n.e2.toString() + "must be IntegerType");
 			}
 
 			
@@ -354,7 +414,7 @@ public class CheckTableVisitor implements TypeVisitor{
 		
 		try{
 			if( !(expType instanceof IntArrayType)){
-				throw new SemanticErrorException(n.e + "must be IntArrayType");
+				throw new SemanticErrorException(n.e.toString() + " must be IntArrayType");
 			}
 		}catch(SemanticErrorException see){
 			see.printStackTrace();
@@ -363,7 +423,45 @@ public class CheckTableVisitor implements TypeVisitor{
 	}
 	@Override
 	public Type visit(Call n) {
-		// TODO Auto-generated method stub
+		Type expType = n.e.accept(this);
+		
+		try {
+			ClassTable ct;
+			
+			if(expType == null) {
+				ct = currenClass;
+			} else {
+				if (!(expType instanceof IdentifierType))
+//					throw new SemanticErrorException(expType.toString() + " needs to be a class.");
+					throw new SemanticErrorException(" needs to be a class.");
+				
+				IdentifierType idClass = (IdentifierType) expType;
+				ct = this.programTable.getClass(Symbol.symbol(idClass.s));
+			}
+			
+			MethodTable mt = ct.getMethod(Symbol.symbol(n.i.s));
+
+			if (n.el.size() != mt.sizeFormal()) 
+				throw new SemanticErrorException(n.i.s + " expects " + mt.sizeFormal() + " params.");
+			
+			int i = 0;
+			
+			for (Enumeration<Symbol> iterator = mt.formalKeys(); iterator.hasMoreElements();) {
+				Type paramType = n.el.elementAt(i++).accept(this);
+				Type formalType = mt.getFormal(iterator.nextElement());
+				
+				if (paramType == null || !paramType.getClass().equals(formalType.getClass())) {
+					throw new SemanticErrorException("Param mismatch error in " + n.i.s);
+				}
+			   
+			}
+			
+			return mt.getReturnType();
+			
+		} catch (SemanticErrorException see) {
+			see.printStackTrace();
+		}
+		
 		return null;
 	}
 	@Override
@@ -384,46 +482,117 @@ public class CheckTableVisitor implements TypeVisitor{
 	@Override
 	public Type visit(IdentifierExp n) {
 		Type idType = null;
-		try{
-			idType = this.currenMethod.getLocal(Symbol.symbol(n.s));
-			if(idType == null){
-				idType = this.currenMethod.getFormal(Symbol.symbol(n.s));
-				if(idType == null){
-					idType = this.currenClass.getField(Symbol.symbol(n.s));
-					if(idType == null){
-						throw new SemanticErrorException("id '" + n.s + "' does not exist");
-					}
-				}
+		
+		try {
+			if (currenMethod != null) {
+				
+				try {
+					idType = this.currenMethod.getLocal(Symbol.symbol(n.s));
+				} catch (SemanticErrorException see) { }
+				
+				if (idType == null)
+					try {
+						idType = this.currenMethod.getFormal(Symbol.symbol(n.s));
+					} catch (SemanticErrorException see) { }
 			}
-		}catch(SemanticErrorException see){
+			
+			if (idType == null)
+				idType = this.currenClass.getField(Symbol.symbol(n.s));
+			
+//			try {
+//				idType = this.currenClass.getField(Symbol.symbol(n.s));
+//			} catch (SemanticErrorException see) { }
+//			
+//			if (idType == null)
+//				throw new SemanticErrorException("id '" + n.s + "' does not exist");
+			
+		} catch(SemanticErrorException see) {
 			see.printStackTrace();
 		}
+		
 		return idType;
 	}
 	@Override
 	public Type visit(This n) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
 	public Type visit(NewArray n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type expType = n.e.accept(this);
+		
+		try {
+			if (!(expType instanceof IntegerType)) {
+				throw new SemanticErrorException(n.e.toString() + " must be integer!");
+			}
+			
+		} catch (SemanticErrorException see) {
+			see.printStackTrace();
+		}
+		
+		return new IntArrayType();
 	}
 	@Override
 	public Type visit(NewObject n) {
-		// TODO Auto-generated method stub
+		
+		try {
+			programTable.getClass(Symbol.symbol(n.i.s));
+			
+			return new IdentifierType(n.i.s);
+			
+		} catch (SemanticErrorException see) {
+			see.printStackTrace();
+		}
+		
 		return null;
 	}
 	@Override
 	public Type visit(Not n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type expType = n.e.accept(this);
+		
+		try {
+			
+			if (!(expType instanceof BooleanType)) {
+				throw new SemanticErrorException(n.e.toString() + " must be boolean!");
+			}
+			
+		} catch (SemanticErrorException see) {
+			see.printStackTrace();
+		}
+		
+		return expType;
 	}
 	@Override
 	public Type visit(Identifier n) {
-		// TODO Auto-generated method stub
-		return null;
+		Type idType = null;
+		
+		try {
+			if (currenMethod != null) {
+				
+				try {
+					idType = this.currenMethod.getLocal(Symbol.symbol(n.s));
+				} catch (SemanticErrorException see) { System.out.println("test"); }
+				
+				if (idType == null)
+					try {
+						idType = this.currenMethod.getFormal(Symbol.symbol(n.s));
+					} catch (SemanticErrorException see) { }
+			}
+			
+			if (idType == null)
+				idType = this.currenClass.getField(Symbol.symbol(n.s));
+			
+//			try {
+//				idType = this.currenClass.getField(Symbol.symbol(n.s));
+//			} catch (SemanticErrorException see) { }
+//			
+//			if (idType == null)
+//				throw new SemanticErrorException("id '" + n.s + "' does not exist");
+			
+		} catch(SemanticErrorException see) {
+			see.printStackTrace();
+		}
+		
+		return idType;
 	}
 	
 	

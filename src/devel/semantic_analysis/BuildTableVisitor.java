@@ -58,6 +58,11 @@ public class BuildTableVisitor implements TypeCheckVisitor {
 					ClassDeclExtends cde = (ClassDeclExtends) cd;
 					
 					result.putClass(Symbol.symbol(cde.i.s), cde.accept(this));
+					
+					ClassTable parentClassTable = result.getClass(Symbol.symbol(cde.j.s));
+					
+					result.getClass(Symbol.symbol(cde.i.s)).setParentClass(parentClassTable);
+					
 				}
 				
 			}

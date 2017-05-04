@@ -15,7 +15,7 @@ public class ProgramTable {
 		classTable.put(key, value);
 	}
 	
-	public ClassTable getClass(Symbol key) {
+	public ClassTable getClass(Symbol key) throws SemanticErrorException {
 		return classTable.get(key);
 	}
 	
@@ -27,8 +27,13 @@ public class ProgramTable {
 	   for (Enumeration<Symbol> iterator = classTable.keys(); iterator.hasMoreElements();) {
 		   Symbol s = iterator.nextElement();
 		   System.out.println(s.toString());
-		   ClassTable ct = classTable.get(s);
-		   ct.print();
+		   
+		   try {
+			   ClassTable ct = classTable.get(s);
+			   ct.print();
+		   } catch (SemanticErrorException see) {
+			   see.printStackTrace();
+		   }
 	   }
 	}
 	
