@@ -19,6 +19,10 @@ public class ClassTable {
 		this.parentClass = parentClass;
 	}
 	
+	public ClassTable getParentClass() {
+		return this.parentClass;
+	}
+	
 	public void putField(Symbol key, Type value) throws SemanticErrorException {
 		fieldTypeTable.put(key, value);
 	}

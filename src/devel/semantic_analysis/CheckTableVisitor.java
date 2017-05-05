@@ -254,7 +254,19 @@ public class CheckTableVisitor implements TypeVisitor {
 						if ( !((idType instanceof IdentifierType) && (expType instanceof IdentifierType)) ) {
 							throw new SemanticErrorException(n.i.s + " and " + expType.toString() + " must have same type to assign");
 						} else if (! (((IdentifierType)idType).s.equals(((IdentifierType) expType).s)) ) {
-							throw new SemanticErrorException(n.i.s + " and " + expType.toString() + " must have same type to assign");
+							ClassTable leftTable = null;
+							ClassTable rightTable = null;
+							
+							try {
+								leftTable = programTable.getClass(Symbol.symbol(((IdentifierType) idType).s));
+								rightTable = programTable.getClass(Symbol.symbol(((IdentifierType) expType).s));
+							} catch (SemanticErrorException see) { }
+							
+							ClassTable rightParentTable = rightTable.getParentClass();
+							
+							if (rightParentTable == null || leftTable != rightParentTable)
+								throw new SemanticErrorException(n.i.s + " and " + expType.toString() + " must have same type to assign");
+
 						}
 					}
 				}

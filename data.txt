@@ -27,7 +27,7 @@ class Facx {
 		
 		return x;
 	}
-		
+
 }
 
 class Facxx extends Fac {
@@ -36,10 +36,15 @@ class Facxx extends Fac {
 		int x;
 		boolean b;
 		Fac f;
+		Fac fx;
 		
 		if (true) { x = 1; } else { x = 2; }
 		
 		f = new Fac();
+		
+		fx = new Facxx();
+		
+		x = f.ComputeFac(10);
 		
 		b = !b;
 		
