@@ -4,9 +4,9 @@ import core.activation_records.temp.Label;
 
 public class CJUMP extends Stm {
   public int relop;
-  public Exp left, right;
+  public AbstractExp left, right;
   public Label iftrue, iffalse;
-  public CJUMP(int rel, Exp l, Exp r, Label t, Label f) {
+  public CJUMP(int rel, AbstractExp l, AbstractExp r, Label t, Label f) {
      relop=rel; left=l; right=r; iftrue=t; iffalse=f;
   }
   public final static int EQ=0, NE=1, LT=2, GT=3, LE=4, GE=5,

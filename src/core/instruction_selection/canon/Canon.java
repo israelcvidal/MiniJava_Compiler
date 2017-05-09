@@ -5,7 +5,7 @@ import core.translation_to_IR.tree.CALL;
 import core.translation_to_IR.tree.CONST;
 import core.translation_to_IR.tree.ESEQ;
 import core.translation_to_IR.tree.EXP;
-import core.translation_to_IR.tree.Exp;
+import core.translation_to_IR.tree.AbstractExp;
 import core.translation_to_IR.tree.ExpList;
 import core.translation_to_IR.tree.MOVE;
 import core.translation_to_IR.tree.NAME;
@@ -52,7 +52,7 @@ public class Canon {
     else return new SEQ(a,b);
  }
 
- static boolean commute(Stm a, Exp b) {
+ static boolean commute(Stm a, AbstractExp b) {
     return isNop(a)
         || b instanceof NAME
         || b instanceof CONST;
@@ -98,12 +98,12 @@ public class Canon {
       return new ESEQ(seq(stms,b.stm), b.exp);
   }
 
- static ESEQ do_exp (Exp e) {
+ static ESEQ do_exp (AbstractExp e) {
        if (e instanceof ESEQ) return do_exp((ESEQ)e);
        else return reorder_exp(e);
  }
          
- static ESEQ reorder_exp (Exp e) {
+ static ESEQ reorder_exp (AbstractExp e) {
      StmExpList x = reorder(e.kids());
      return new ESEQ(x.stm, e.build(x.exps));
  }
@@ -113,10 +113,10 @@ public class Canon {
  static StmExpList reorder(ExpList exps) {
      if (exps==null) return nopNull;
      else {
-       Exp a = exps.head;
+       AbstractExp a = exps.head;
        if (a instanceof CALL) {
          Temp t = new Temp();
-	 Exp e = new ESEQ(new MOVE(new TEMP(t), a),
+	 AbstractExp e = new ESEQ(new MOVE(new TEMP(t), a),
 				    new TEMP(t));
          return reorder(new ExpList(e, exps.tail));
        } else {

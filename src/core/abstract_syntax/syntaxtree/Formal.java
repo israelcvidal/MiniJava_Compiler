@@ -1,6 +1,8 @@
 package core.abstract_syntax.syntaxtree;
 
 import core.abstract_syntax.visitor.Visitor;
+import devel.semantic_analysis.TypeTable;
+import devel.semantic_analysis.TypeCheckVisitor;
 import core.abstract_syntax.visitor.TypeVisitor;
 
 public class Formal {
@@ -17,5 +19,9 @@ public class Formal {
 
   public Type accept(TypeVisitor v) {
     return v.visit(this);
+  }
+  
+  public Type accept(TypeCheckVisitor v) {
+	  return v.visit(this);
   }
 }

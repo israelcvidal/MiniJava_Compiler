@@ -1,8 +1,8 @@
 package core.translation_to_IR.tree;
 
 public class MOVE extends Stm {
-  public Exp dst, src;
-  public MOVE(Exp d, Exp s) {dst=d; src=s;}
+  public AbstractExp dst, src;
+  public MOVE(AbstractExp d, AbstractExp s) {dst=d; src=s;}
   public ExpList kids() {
         if (dst instanceof MEM)
 	   return new ExpList(((MEM)dst).exp, new ExpList(src,null));

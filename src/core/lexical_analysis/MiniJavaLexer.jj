@@ -4,11 +4,12 @@ options {
 
 PARSER_BEGIN(MiniJavaParser)
   package core.lexical_analysis;
+  import core.abstract_syntax.syntaxtree.*;
   public class MiniJavaParser {}
 PARSER_END(MiniJavaParser)
 
 SKIP: { //White space
-		" "
+	 	" "
 	|	"\t"
 	|	"\n"
 	|	"\r"
@@ -95,105 +96,225 @@ TOKEN: { //Reserved words
   	 	>
 }
 
-void Goal():
-{}
+Program Program():
 {
-  Program()
-  <EOF>
+	MainClass mc;
+	ClassDeclList cdl;
+}
+{ (
+  	mc = MainClass()
+  	cdl = ClassDeclList()
+  	< EOF >
+  )
+  
+  { return new Program(mc,cdl); }
 }
 
-void Program():
-{}
+ClassDeclList ClassDeclList() :
 {
-  MainClass()
-  ( ClassDeclaration() )*
+  	ClassDeclList cdl = new ClassDeclList();
+	ClassDecl c;
 }
-
-void MainClass():
-{}
 {
-  < CLASS > < IDENTIFIER > < LBRACE > < PUBLIC > < STATIC > < VOID > < MAIN > < LPAREN > < STRING > < LSQPAREN > < RSQPAREN > < IDENTIFIER > < RPAREN > < LBRACE > Statement() < RBRACE > < RBRACE >
+	(c = ClassDeclaration() { cdl.addElement(c); })*
+	{ return cdl; }
 }
 
-void ClassDeclaration():
-{}
+MainClass MainClass():
 {
-  < CLASS > < IDENTIFIER > ( < EXTENDS > < IDENTIFIER > )? < LBRACE > ( VarDeclaration() )* ( MethodDeclaration() )* < RBRACE >
+	Identifier idClass,idParam;
+	Statement stm;
+}
+{ (
+	< CLASS > idClass = Identifier() < LBRACE >
+	< PUBLIC > < STATIC > < VOID > < MAIN > < LPAREN > < STRING > < LSQPAREN > < RSQPAREN > idParam = Identifier() < RPAREN >
+	< LBRACE > stm = Statement() < RBRACE > < RBRACE >
+  )
+
+	{return new MainClass(idClass, idParam, stm);}
 }
 
-void VarDeclaration():
-{}
+
+ClassDecl ClassDeclaration():
 {
-  Type() < IDENTIFIER > < SEMICOLON >
+	Identifier id, ex = null;
+	ClassDecl cl;
+	VarDeclList vl = new VarDeclList();
+	MethodDeclList ml = new MethodDeclList();
+	VarDecl v;
+	MethodDecl m;
 }
-
-void MethodDeclaration():
-{}
 {
-  < PUBLIC > Type() < IDENTIFIER > < LPAREN > FormalList() < RPAREN > < LBRACE > ( LOOKAHEAD(2) VarDeclaration() )* ( Statement() )* < RETURN > Expression() < SEMICOLON > < RBRACE >
+	< CLASS > id = Identifier() ( < EXTENDS > ex = Identifier() )? < LBRACE > ( v = VarDeclaration() { vl.addElement(v); })* ( m = MethodDeclaration() { ml.addElement(m); })* < RBRACE >
+	{
+		if(ex!=null) return new ClassDeclExtends(id,ex,vl,ml);
+		return new ClassDeclSimple(id,vl,ml);
+	}
+		
+	  
 }
 
-void FormalList():
-{}
+VarDecl VarDeclaration():
 {
-  Type() < IDENTIFIER > (FormalRest())*
+	Type t;
+	Identifier id;
 }
-
-void FormalRest():
-{}
 {
-  < COMMA > Type() < IDENTIFIER >
+	t = Type() id = Identifier() < SEMICOLON >
+	{return new VarDecl(t,id);}
 }
 
-void Type():
-{}
-{ < INTEGER > ( < LSQPAREN > < RSQPAREN > )?
-| < BOOLEAN >
-| < IDENTIFIER >
+MethodDecl MethodDeclaration():
+{
+	Type at;
+	Identifier ai;
+	FormalList afl;
+	VarDeclList avl = new VarDeclList();
+	VarDecl v;
+	Statement sl;
+	StatementList asl = new StatementList();
+	Exp ae;
+}
+{
+	(	  < PUBLIC > at = Type() ai = Identifier() < LPAREN > afl = FormalList() < RPAREN > < LBRACE > ( LOOKAHEAD(2) v = VarDeclaration() { avl.addElement(v);})* ( sl = Statement() {asl.addElement(sl);})* < RETURN > ae = Expression() < SEMICOLON > < RBRACE >
+	)
+	
+	{ return new MethodDecl(at, ai, afl, avl, asl, ae); }
 }
 
-void Statement():
-{}
-{ < LBRACE > ( Statement() )* < RBRACE >
-| < IF > < LPAREN > Expression() < RPAREN > Statement() < ELSE > Statement()
-| < WHILE > < LPAREN > Expression() < RPAREN > Statement()
-| < PRINT > < LPAREN > Expression() < RPAREN > < SEMICOLON >
-| < IDENTIFIER > ( < ASSIGN > Expression() < SEMICOLON >
-				 | < LSQPAREN > Expression() < RSQPAREN > < ASSIGN > Expression() < SEMICOLON >
-				 )
+FormalList FormalList():
+{
+	FormalList fl = new FormalList();
+	Formal f;
+	Type t;
+	Identifier id;
+}
+{
+	(	  t = Type() id = Identifier() { fl.addElement(new Formal(t,id)); } (f = FormalRest() {fl.addElement(f);})*
+	)
+	
+	{ return fl; }
 }
 
-void Expression():
-{}
-{ ( <INTEGER_LITERAL>
-  | < TRUE >
-  | < FALSE >
-  | < IDENTIFIER >
-  | < THIS >
-  | < NEW > ( < INTEGER > < LSQPAREN > Expression() < RSQPAREN > | < IDENTIFIER > < LPAREN > < RPAREN > )
-  | < NOT > Expression()
-  | < LPAREN > Expression() < RPAREN >
-  ) Expression_()
+Formal FormalRest():
+{
+	Type t;
+	Identifier id;
+}
+{
+	(	  < COMMA > t = Type() id = Identifier()
+	)
+
+	{ return new Formal(t,id); }
 }
 
-void Expression_():
-{}
-{ ( LOOKAHEAD(2) ( ( < AND > | < LT > | < PLUS > | < MINUS > | < TIMES > ) Expression()			     | < LSQPAREN > Expression() < RSQPAREN >
-			     | < DOT > ( < LENGTH > | < IDENTIFIER > < LPAREN > ExpList() < RPAREN > )
-			     ) Expression_()
+Type Type():
+{
+  	Identifier id;
+	Type t;
+}
+{ ( < INTEGER > {t = new IntegerType();} ( < LSQPAREN > < RSQPAREN > {t = new IntArrayType();})?
+  | < BOOLEAN > {t = new BooleanType();}
+  | id = Identifier() {t = new IdentifierType(id.s);}
+  )
+  
+  { return t; }
+}
+
+Statement Statement():
+{
+  	Statement stm, s, ifStm, elseStm;
+	StatementList stmList = new StatementList();
+	Exp ae, aeI;
+	Identifier id;
+}
+{ ( < LBRACE > ( s = Statement() { stmList.addElement(s); } )* < RBRACE > { stm = new Block(stmList); }
+  | < IF > < LPAREN > ae = Expression() < RPAREN > ifStm = Statement() < ELSE > elseStm = Statement() { stm = new If(ae,ifStm,elseStm); }
+  | < WHILE > < LPAREN > ae = Expression() < RPAREN > s = Statement() { stm = new While(ae,s);}
+  | < PRINT > < LPAREN > ae = Expression() < RPAREN > < SEMICOLON > { stm = new Print(ae); }
+  | id = Identifier() ( < ASSIGN > ae = Expression() < SEMICOLON > { stm = new Assign(id, ae); }
+				 	  | < LSQPAREN > aeI = Expression() < RSQPAREN > < ASSIGN >  ae = Expression() < SEMICOLON > { stm = new ArrayAssign(id,aeI,ae); }
+				 	  )
+  )
+  
+  { return stm; }
+}
+
+Identifier Identifier():
+{
+  Token t;
+}
+{
+	(	  t = <  IDENTIFIER >
+	)
+	
+	{ return new Identifier(t.toString()); }
+}
+
+Exp Expression():
+{
+	Exp expResult, exp;
+	Token tok;
+	Identifier id;
+}
+{
+	( tok = <INTEGER_LITERAL> { exp = new IntegerLiteral(Integer.parseInt(tok.image)); }
+	| < TRUE > { exp = new True(); }
+	| < FALSE > { exp = new False(); }
+	| id = Identifier() { exp = new IdentifierExp(id.toString()); }
+	| < THIS > { exp = new This(); }
+	| < NEW > ( < INTEGER > < LSQPAREN > exp = Expression() < RSQPAREN > { exp = new NewArray(exp); }
+			  | id = Identifier() < LPAREN > < RPAREN > { exp = new NewObject(id); }
+			  )
+	| < NOT > exp = Expression() { exp = new Not(exp); }
+	| < LPAREN > exp = Expression() < RPAREN >
+	) expResult = Expression_(exp)
+
+	{ return expResult; }
+}
+
+Exp Expression_(Exp expLeft):
+{
+	Exp expResult = expLeft, expRight = null, exp;
+	Identifier id;
+	ExpList expList;
+}
+{ ( LOOKAHEAD(2) ( ( < AND > 	expRight = Expression() { exp = new And(expLeft, expRight); }
+				   | < LT > 	expRight = Expression() { exp = new LessThan(expLeft, expRight); }
+				   | < PLUS > 	expRight = Expression() { exp = new Plus(expLeft, expRight); }
+				   | < MINUS > 	expRight = Expression() { exp = new Minus(expLeft, expRight); }
+				   | < TIMES > 	expRight = Expression() { exp = new Times(expLeft, expRight); }
+				   )			     | < LSQPAREN > expLeft = Expression() < RSQPAREN > { exp = expLeft; }
+			     | < DOT > ( < LENGTH > { exp = new ArrayLength(expLeft); }
+			     		   | id = Identifier() < LPAREN > expList = ExpList() < RPAREN > { exp = new Call(expLeft, id, expList); }
+			     		   )
+			     ) expResult = Expression_(exp)
   )?
+
+  { return expResult; }
 }
 
-void ExpList():
-{}
+ExpList ExpList():
 {
-  Expression() ( ExpRest() )*
+	ExpList expl = new ExpList();
+	Exp exp;
+}
+{
+	(	  exp = Expression() {expl.addElement(exp);} ( exp = ExpRest() {expl.addElement(exp);} )*
+	)
+	
+	{ return expl; }
 }
 
-void ExpRest():
-{}
+Exp ExpRest():
 {
-  < COMMA > Expression()
+	Exp exp;
+}
+{
+	(	  < COMMA > exp = Expression()
+	)
+	
+	{ return exp; }
 }
 
 void MiniJavaToken():
