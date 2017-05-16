@@ -582,7 +582,7 @@ public class CheckTableVisitor implements TypeVisitor {
 				
 				try {
 					idType = this.currenMethod.getLocal(Symbol.symbol(n.s));
-				} catch (SemanticErrorException see) { System.out.println("test"); }
+				} catch (SemanticErrorException see) { }
 				
 				if (idType == null)
 					try {

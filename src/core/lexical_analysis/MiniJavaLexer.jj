@@ -191,7 +191,7 @@ FormalList FormalList():
 }
 {
 	(	  t = Type() id = Identifier() { fl.addElement(new Formal(t,id)); } (f = FormalRest() {fl.addElement(f);})*
-	)
+	)?
 	
 	{ return fl; }
 }
@@ -301,7 +301,7 @@ ExpList ExpList():
 }
 {
 	(	  exp = Expression() {expl.addElement(exp);} ( exp = ExpRest() {expl.addElement(exp);} )*
-	)
+	)?
 	
 	{ return expl; }
 }
