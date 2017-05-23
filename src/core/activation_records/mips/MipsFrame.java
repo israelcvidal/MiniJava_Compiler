@@ -7,22 +7,23 @@ import java.util.List;
 import java.util.ListIterator;
 
 import core.activation_records.frame.Access;
-import core.activation_records.frame.AccessList;
 import core.activation_records.frame.Frame;
 import core.activation_records.temp.Label;
 import core.activation_records.temp.Temp;
-import core.activation_records.util.BoolList;
+import core.activation_records.temp.TempList;
 import core.instruction_selection.assem.Instr;
 import core.instruction_selection.assem.OPER;
 import core.translation_to_IR.tree.AbstractExp;
-import core.translation_to_IR.tree.CONST;
 import core.translation_to_IR.tree.CALL;
+import core.translation_to_IR.tree.CONST;
+import core.translation_to_IR.tree.ExpList;
+import core.translation_to_IR.tree.MOVE;
 import core.translation_to_IR.tree.NAME;
 import core.translation_to_IR.tree.SEQ;
 import core.translation_to_IR.tree.Stm;
-import core.translation_to_IR.tree.MOVE;
 import core.translation_to_IR.tree.TEMP;
 import devel.semantic_analysis.Symbol;
+import sun.reflect.generics.tree.Tree;
 
 public class MipsFrame extends Frame {
 
@@ -174,15 +175,15 @@ public class MipsFrame extends Frame {
     public Temp RV() { return V0; }
 
     private static HashMap<String,Label> labels = new HashMap<String,Label>();
-    public AbstractExp externalCall(String s, List<AbstractExp> args) {
+    public AbstractExp externalCall(String s, ExpList args) {
 	String func = s.intern();
 	Label l = labels.get(func);
 	if (l == null) {
 	    l = new Label("_" + func);
 	    labels.put(func, l);
 	}
-	args.add(0, new CONST(0));
-	return new CALL(new NAME(l), args);
+
+	return new CALL(new NAME(l), new ExpList(new CONST(0),args));
     }
 
     public String string(Label lab, String string) {
@@ -265,9 +266,9 @@ public class MipsFrame extends Frame {
 
     public List<Instr> codegen(List<Stm> stms) {
 	List<Instr> insns = new LinkedList<Instr>();
-	Codegen cg = new Codegen(this, insns.listIterator());
-	for (java.util.Iterator<Stm> s = stms.iterator(); s.hasNext(); )
-	    s.next().accept(cg);
+//	Codegen cg = new Codegen(this, insns.listIterator());
+//	for (java.util.Iterator<Stm> s = stms.iterator(); s.hasNext(); )
+//	    s.next().accept(cg);
 	return insns;
     }
 
@@ -339,12 +340,13 @@ public class MipsFrame extends Frame {
 	assignCallees(0, body);
     }
 
-    private static Instr OPER(String a, Temp[] d, Temp[] s) {
-	return new OPER(a, d, s, null);
+    private static Instr OPER(String a, TempList d, TempList s) {
+    	return new OPER(a, d, s);
     }
 
     public void procEntryExit2(List<Instr> body) {
-	body.add(OPER("#\treturn", null, returnSink));
+    	TempList t;
+    	body.add(OPER("#\treturn", null, returnSink));
     }
 
     public void procEntryExit3(List<Instr> body) {
@@ -355,11 +357,11 @@ public class MipsFrame extends Frame {
 	cursor.add(OPER(name + "_framesize=" + frameSize, null, null));
 	if (frameSize != 0) {
 	    cursor.add(OPER("\tsubu $sp " + name + "_framesize",
-			    new Temp[]{SP}, new Temp[]{SP}));
+	    		new TempList(SP,null), new TempList(SP,null)));
 	    body.add(OPER("\taddu $sp " + name + "_framesize",
-			  new Temp[]{SP}, new Temp[]{SP}));
+	    		new TempList(SP,null), new TempList(SP,null)));
 	}
-	body.add(OPER("\tj $ra", null, new Temp[]{RA}));
+	body.add(OPER("\tj $ra", null, new TempList(RA,null)));
     }
 
     private static Temp[] registers = {};
@@ -385,36 +387,40 @@ public class MipsFrame extends Frame {
 		throw new Error("Spilling unimplemented");
 	    }
             else for (int s = 0; s < spills.length; s++) {
-		Tree.Exp exp = allocLocal(true).exp(TEMP(FP));
+		AbstractExp exp = allocLocal(true).exp(TEMP(FP));
 		for (ListIterator<Instr> i = insns.listIterator();
 		     i.hasNext(); ) {
 		    Instr insn = i.next();
-		    Temp[] use = insn.use;
-		    if (use != null)
-			for (int u = 0; u < use.length; u++) {
-			    if (use[u] == spills[s]) {
-				Temp t = new Temp();
-				t.spillTemp = true;
-				Stm stm = MOVE(TEMP(t), exp);
-				i.previous();
-				stm.accept(new Codegen(this, i));
-				if (insn != i.next())
-				    throw new Error();
-				insn.replaceUse(spills[s], t);
-				break;
+		    TempList use = insn.use();
+		    
+			while(use!=null) {
+			    if (use.head == spills[s]) {
+					Temp t = new Temp();
+					t.spillTemp = true;
+					Stm stm = MOVE(TEMP(t), exp);
+					i.previous();
+					//stm.accept(new Codegen(this, i));
+					if (insn != i.next())
+					    throw new Error();
+					insn.replaceUse(spills[s], t);
+					break;
 			    }
+			    
+			    use = use.tail;
 			}
-		    Temp[] def = insn.def;
-		    if (def != null)
-			for (int d = 0; d < def.length; d++) {
-			    if (def[d] == spills[s]) {
-				Temp t = new Temp();
-				t.spillTemp = true;
-				insn.replaceDef(spills[s], t);
-				Stm stm = MOVE(exp, TEMP(t));
-				stm.accept(new Codegen(this, i));
-				break;
+		    TempList def = insn.def();
+		    
+			while(def!=null) {
+			    if (def.head == spills[s]) {
+					Temp t = new Temp();
+					t.spillTemp = true;
+					insn.replaceDef(spills[s], t);
+					Stm stm = MOVE(exp, TEMP(t));
+					//stm.accept(new Codegen(this, i));
+					break;
 			    }
+			    
+			    def = def.tail;
 			}
 		}
 	    }

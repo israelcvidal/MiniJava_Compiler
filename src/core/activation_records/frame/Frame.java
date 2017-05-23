@@ -7,6 +7,7 @@ import core.activation_records.temp.Temp;
 import core.activation_records.temp.TempMap;
 import core.instruction_selection.assem.Instr;
 import core.translation_to_IR.tree.AbstractExp;
+import core.translation_to_IR.tree.ExpList;
 import core.translation_to_IR.tree.Stm;
 import devel.semantic_analysis.Symbol;
 
@@ -17,7 +18,7 @@ public abstract class Frame implements TempMap {
     public abstract Access allocLocal(boolean escape);
     public abstract Temp FP();
     public abstract int wordSize();
-    public abstract AbstractExp externalCall(String func, List<AbstractExp> args);
+    public abstract AbstractExp externalCall(String func, ExpList args);
     public abstract Temp RV();
     public abstract String string(Label label, String value);
     public abstract Label badPtr();
