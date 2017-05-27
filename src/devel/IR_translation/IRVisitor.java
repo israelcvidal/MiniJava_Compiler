@@ -10,7 +10,6 @@ import core.abstract_syntax.syntaxtree.BooleanType;
 import core.abstract_syntax.syntaxtree.Call;
 import core.abstract_syntax.syntaxtree.ClassDeclExtends;
 import core.abstract_syntax.syntaxtree.ClassDeclSimple;
-import core.abstract_syntax.syntaxtree.Exp;
 import core.abstract_syntax.syntaxtree.False;
 import core.abstract_syntax.syntaxtree.Formal;
 import core.abstract_syntax.syntaxtree.Identifier;
@@ -35,223 +34,214 @@ import core.abstract_syntax.syntaxtree.Times;
 import core.abstract_syntax.syntaxtree.True;
 import core.abstract_syntax.syntaxtree.VarDecl;
 import core.abstract_syntax.syntaxtree.While;
-import core.abstract_syntax.visitor.IRVisitor;
-import core.translation_to_IR.tree.AbstractExp;
-import core.translation_to_IR.tree.CJUMP;
-import core.translation_to_IR.tree.MOVE;
-import core.translation_to_IR.tree.PRINT;
-import core.translation_to_IR.tree.Stm;
+import core.abstract_syntax.visitor.Visitor;
 
-public class IRVisitorImpl implements IRVisitor {
+public class IRVisitor implements Visitor {
 
 	@Override
-	public Stm visit(Program n) {
+	public void visit(Program n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public Stm visit(MainClass n) {
+	public void visit(MainClass n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public Stm visit(ClassDeclSimple n) {
+	public void visit(ClassDeclSimple n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public Stm visit(ClassDeclExtends n) {
+	public void visit(ClassDeclExtends n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public Stm visit(VarDecl n) {
+	public void visit(VarDecl n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public Stm visit(MethodDecl n) {
+	public void visit(MethodDecl n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public Stm visit(Formal n) {
+	public void visit(Formal n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public Stm visit(Block n) {
+	public void visit(IntArrayType n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public Stm visit(If n) {
+	public void visit(BooleanType n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public Stm visit(While n) {
+	public void visit(IntegerType n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public Stm visit(Assign n) {
+	public void visit(IdentifierType n) {
 		// TODO Auto-generated method stub
-		return new MOVE(visit(n.i),visit(n.e));
+		
 	}
 
 	@Override
-	public Stm visit(ArrayAssign n) {
+	public void visit(Block n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public PRINT visit(Print n) {
+	public void visit(If n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(IntArrayType n) {
+	public void visit(While n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(BooleanType n) {
+	public void visit(Print n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(IntegerType n) {
+	public void visit(Assign n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(IdentifierType n) {
+	public void visit(ArrayAssign n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(And n) {
+	public void visit(And n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(LessThan n) {
+	public void visit(LessThan n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(Plus n) {
+	public void visit(Plus n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(Minus n) {
+	public void visit(Minus n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(Times n) {
+	public void visit(Times n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(ArrayLookup n) {
+	public void visit(ArrayLookup n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(ArrayLength n) {
+	public void visit(ArrayLength n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(Call n) {
+	public void visit(Call n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(IntegerLiteral n) {
+	public void visit(IntegerLiteral n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(True n) {
+	public void visit(True n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(False n) {
+	public void visit(False n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(IdentifierExp n) {
+	public void visit(IdentifierExp n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(This n) {
+	public void visit(This n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(NewArray n) {
+	public void visit(NewArray n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(NewObject n) {
+	public void visit(NewObject n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(Not n) {
+	public void visit(Not n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractExp visit(Identifier n) {
+	public void visit(Identifier n) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
-	@Override
-	public AbstractExp visit(Exp n) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 	
 }
