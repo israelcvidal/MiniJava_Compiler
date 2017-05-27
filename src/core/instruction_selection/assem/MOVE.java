@@ -13,5 +13,15 @@ public class MOVE extends Instr {
    public TempList use() {return new TempList(src,null);}
    public TempList def() {return new TempList(dst,null);}
    public Targets jumps()     {return null;}
+@Override
+public void replaceUse(Temp s, Temp t) {
+	// TODO Auto-generated method stub
+	
+}
+@Override
+public void replaceDef(Temp s, Temp t) {
+	// TODO Auto-generated method stub
+	
+}
 
 }

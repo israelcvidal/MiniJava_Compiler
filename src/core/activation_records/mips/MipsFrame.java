@@ -345,8 +345,11 @@ public class MipsFrame extends Frame {
     }
 
     public void procEntryExit2(List<Instr> body) {
-    	TempList t;
-    	body.add(OPER("#\treturn", null, returnSink));
+    	TempList t = null;
+    	for (int i = returnSink.length-1; i>=0; i--)
+    		t = new TempList(returnSink[i],t);
+    	
+    	body.add(OPER("#\treturn", null, t));
     }
 
     public void procEntryExit3(List<Instr> body) {

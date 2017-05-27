@@ -1,6 +1,7 @@
 package core.instruction_selection.assem;
 
 import core.activation_records.temp.LabelList;
+import core.activation_records.temp.Temp;
 import core.activation_records.temp.TempList;
 
 public class OPER extends Instr {
@@ -18,5 +19,15 @@ public class OPER extends Instr {
    public TempList use() {return src;}
    public TempList def() {return dst;}
    public Targets jumps() {return jump;}
+@Override
+public void replaceUse(Temp s, Temp t) {
+	// TODO Auto-generated method stub
+	
+}
+@Override
+public void replaceDef(Temp s, Temp t) {
+	// TODO Auto-generated method stub
+	
+}
 
 }

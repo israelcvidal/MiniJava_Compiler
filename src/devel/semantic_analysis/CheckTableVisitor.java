@@ -243,7 +243,8 @@ public class CheckTableVisitor implements TypeVisitor {
 	}
 	@Override
 	public Type visit(Assign n) {
-		Type expType = n.e.accept(this);
+		Type expType; //debug
+		expType = n.e.accept(this);
 		Type idType = n.i.accept(this);
 		
 		try{
@@ -252,6 +253,8 @@ public class CheckTableVisitor implements TypeVisitor {
 				if( !((idType instanceof BooleanType) && (expType instanceof BooleanType)) ) {
 					if( !((idType instanceof IntArrayType) && (expType instanceof IntArrayType)) ) {					
 						if ( !((idType instanceof IdentifierType) && (expType instanceof IdentifierType)) ) {
+							System.out.println(n.i.s);
+							System.out.println(expType==null);
 							throw new SemanticErrorException(n.i.s + " and " + expType.toString() + " must have same type to assign");
 						} else if (! (((IdentifierType)idType).s.equals(((IdentifierType) expType).s)) ) {
 							ClassTable leftTable = null;
