@@ -41,31 +41,51 @@ public class IRVisitor implements Visitor {
 	@Override
 	public void visit(Program n) {
 		// TODO Auto-generated method stub
+		n.m.accept(this);
+		
+		for(int i=0; i<n.cl.size();i++){
+			n.cl.elementAt(i).accept(this);
+		}
 		
 	}
 
 	@Override
 	public void visit(MainClass n) {
 		// TODO Auto-generated method stub
-		
+		n.s.accept(this);
 	}
 
 	@Override
 	public void visit(ClassDeclSimple n) {
 		// TODO Auto-generated method stub
 		
+		for(int i=0;i<n.vl.size();i++){
+			n.vl.elementAt(i).accept(this);
+		}
+		
+		for(int i=0; i<n.ml.size();i++){
+			n.ml.elementAt(i).accept(this);
+		}
+		
 	}
 
 	@Override
 	public void visit(ClassDeclExtends n) {
 		// TODO Auto-generated method stub
+		for(int i=0;i<n.vl.size();i++){
+			n.vl.elementAt(i).accept(this);
+		}
 		
+		for(int i=0; i<n.ml.size();i++){
+			n.ml.elementAt(i).accept(this);
+		}
 	}
 
 	@Override
 	public void visit(VarDecl n) {
 		// TODO Auto-generated method stub
-		
+		n.t.accept(this);
+		n.i.accept(this);
 	}
 
 	@Override
