@@ -10,6 +10,7 @@ import core.abstract_syntax.syntaxtree.BooleanType;
 import core.abstract_syntax.syntaxtree.Call;
 import core.abstract_syntax.syntaxtree.ClassDeclExtends;
 import core.abstract_syntax.syntaxtree.ClassDeclSimple;
+import core.abstract_syntax.syntaxtree.Exp;
 import core.abstract_syntax.syntaxtree.False;
 import core.abstract_syntax.syntaxtree.Formal;
 import core.abstract_syntax.syntaxtree.Identifier;
@@ -36,6 +37,8 @@ import core.abstract_syntax.syntaxtree.VarDecl;
 import core.abstract_syntax.syntaxtree.While;
 import core.abstract_syntax.visitor.IRVisitor;
 import core.translation_to_IR.tree.AbstractExp;
+import core.translation_to_IR.tree.CJUMP;
+import core.translation_to_IR.tree.MOVE;
 import core.translation_to_IR.tree.PRINT;
 import core.translation_to_IR.tree.Stm;
 
@@ -104,7 +107,7 @@ public class IRVisitorImpl implements IRVisitor {
 	@Override
 	public Stm visit(Assign n) {
 		// TODO Auto-generated method stub
-		return null;
+		return new MOVE(visit(n.i),visit(n.e));
 	}
 
 	@Override
@@ -241,6 +244,12 @@ public class IRVisitorImpl implements IRVisitor {
 
 	@Override
 	public AbstractExp visit(Identifier n) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AbstractExp visit(Exp n) {
 		// TODO Auto-generated method stub
 		return null;
 	}

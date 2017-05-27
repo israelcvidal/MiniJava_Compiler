@@ -21,6 +21,7 @@ public interface IRVisitor {
   
   public PRINT visit(Print n);
   
+  public AbstractExp visit(Exp n);
   public AbstractExp visit(IntArrayType n);
   public AbstractExp visit(BooleanType n);
   public AbstractExp visit(IntegerType n);
