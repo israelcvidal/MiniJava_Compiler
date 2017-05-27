@@ -35,14 +35,26 @@ import core.abstract_syntax.syntaxtree.True;
 import core.abstract_syntax.syntaxtree.VarDecl;
 import core.abstract_syntax.syntaxtree.While;
 import core.abstract_syntax.visitor.Visitor;
+import core.translation_to_IR.tree.SEQ;
+import devel.semantic_analysis.ClassTable;
+import devel.semantic_analysis.MethodTable;
+import devel.semantic_analysis.ProgramTable;
+import devel.semantic_analysis.SemanticErrorException;
+import devel.semantic_analysis.Symbol;
 
 public class IRVisitor implements Visitor {
-
+	private ProgramTable programTable;
+	private ClassTable currenClass = null;
+	private MethodTable currenMethod = null;
+	private SEQ IRTree;
+	
+	public IRVisitor(ProgramTable pt){
+		programTable = pt;
+	}
+	
 	@Override
 	public void visit(Program n) {
-		// TODO Auto-generated method stub
 		n.m.accept(this);
-		
 		for(int i=0; i<n.cl.size();i++){
 			n.cl.elementAt(i).accept(this);
 		}
@@ -51,14 +63,18 @@ public class IRVisitor implements Visitor {
 
 	@Override
 	public void visit(MainClass n) {
-		// TODO Auto-generated method stub
-		n.s.accept(this);
+		try {
+			
+			currenClass = programTable.getClass(Symbol.symbol(n.i1.s));
+			n.s.accept(this);
+			
+		} catch (SemanticErrorException see) {see.printStackTrace();}
 	}
 
 	@Override
 	public void visit(ClassDeclSimple n) {
 		// TODO Auto-generated method stub
-		
+		currentClass = programTable.getClass(Symbol.symbol(n.i.s));
 		for(int i=0;i<n.vl.size();i++){
 			n.vl.elementAt(i).accept(this);
 		}
