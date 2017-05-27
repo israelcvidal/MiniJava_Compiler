@@ -80,7 +80,6 @@ public class CheckTableVisitor implements TypeVisitor {
 	
 		return null;
 	}
-	
 	@Override
 	public Type visit(ClassDeclSimple n) {
 		try {
