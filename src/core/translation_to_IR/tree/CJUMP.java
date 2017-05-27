@@ -1,7 +1,6 @@
 package core.translation_to_IR.tree;
 
 import core.activation_records.temp.Label;
-import core.translation_to_IR.visitor.Visitor;
 
 public class CJUMP extends Stm {
   public int relop;
@@ -32,8 +31,5 @@ public class CJUMP extends Stm {
     }
   }
   
-  public void accpet(Visitor v){
-	  v.visit(this);
-  }
 }
 

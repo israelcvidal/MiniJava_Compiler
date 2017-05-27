@@ -1,7 +1,5 @@
 package core.translation_to_IR.tree;
 
-import core.translation_to_IR.visitor.Visitor;
-
 public class MOVE extends Stm {
   public AbstractExp dst, src;
   public MOVE(AbstractExp d, AbstractExp s) {dst=d; src=s;}
@@ -16,8 +14,5 @@ public class MOVE extends Stm {
 	else return new MOVE(dst, kids.head);
   }
   
-  public void accpet(Visitor v){
-	  v.visit(this);
-  }
 }
 

@@ -1,7 +1,5 @@
 package core.translation_to_IR.tree;
 
-import core.translation_to_IR.visitor.Visitor;
-
 public class CALL extends AbstractExp {
   public AbstractExp func;
   public ExpList args;
@@ -11,9 +9,6 @@ public class CALL extends AbstractExp {
     return new CALL(kids.head,kids.tail);
   }
   
-  public void accpet(Visitor v){
-	  v.visit(this);
-  }
   
 }
 

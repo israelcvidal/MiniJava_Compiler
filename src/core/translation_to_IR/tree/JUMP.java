@@ -2,7 +2,6 @@ package core.translation_to_IR.tree;
 
 import core.activation_records.temp.Label;
 import core.activation_records.temp.LabelList;
-import core.translation_to_IR.visitor.Visitor;
 
 public class JUMP extends Stm {
   public AbstractExp exp;
@@ -16,8 +15,5 @@ public class JUMP extends Stm {
     return new JUMP(kids.head,targets);
   }
   
-  public void accpet(Visitor v){
-	  v.visit(this);
-  }
 }
 

@@ -1,7 +1,5 @@
 package core.translation_to_IR.tree;
 
-import core.translation_to_IR.visitor.Visitor;
-
 public class EXP extends Stm {
 	  public AbstractExp exp; 
 	  public EXP(AbstractExp e) {exp=e;}
@@ -10,7 +8,4 @@ public class EXP extends Stm {
 	    return new EXP(kids.head);
 	  }
 	  
-	  public void accpet(Visitor v){
-		  v.visit(this);
-	  }
 	}

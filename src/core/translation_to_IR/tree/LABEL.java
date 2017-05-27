@@ -1,7 +1,6 @@
 package core.translation_to_IR.tree;
 
 import core.activation_records.temp.Label;
-import core.translation_to_IR.visitor.Visitor;
 
 public class LABEL extends Stm { 
   public Label label;
@@ -11,8 +10,5 @@ public class LABEL extends Stm {
     return this;
   }
   
-  public void accpet(Visitor v){
-	  v.visit(this);
-  }
 }
 

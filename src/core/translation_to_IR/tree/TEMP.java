@@ -1,7 +1,6 @@
 package core.translation_to_IR.tree;
 
 import core.activation_records.temp.Temp;
-import core.translation_to_IR.visitor.Visitor;
 
 public class TEMP extends AbstractExp {
   public Temp temp;
@@ -10,8 +9,5 @@ public class TEMP extends AbstractExp {
   public AbstractExp build(ExpList kids) {return this;}
   
   
-  public void accpet(Visitor v){
-	  v.visit(this);
-  }
 }
 

@@ -1,7 +1,5 @@
 package core.translation_to_IR.tree;
 
-import core.translation_to_IR.visitor.Visitor;
-
 public class BINOP extends AbstractExp {
   public int binop;
   public AbstractExp left, right;
@@ -15,8 +13,5 @@ public class BINOP extends AbstractExp {
     return new BINOP(binop,kids.head,kids.tail.head);
   }
   
-  public void accpet(Visitor v){
-	  v.visit(this);
-  }
 }
 
