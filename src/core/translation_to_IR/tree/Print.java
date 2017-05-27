@@ -2,6 +2,7 @@ package core.translation_to_IR.tree;
 
 import core.activation_records.temp.DefaultMap;
 import core.activation_records.temp.TempMap;
+import core.translation_to_IR.visitor.Visitor;
 
 public class Print {
 
@@ -145,5 +146,9 @@ public class Print {
 
   public void prStm(Stm s) {prStm(s,0); say("\n");}
   public void prExp(AbstractExp e) {prExp(e,0); say("\n");}
+  
+  public void accpet(Visitor v){
+	  v.visit(this);
+  }
 
 }
