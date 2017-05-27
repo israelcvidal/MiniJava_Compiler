@@ -76,14 +76,14 @@ public class BuildTableVisitor implements TypeCheckVisitor {
 
 	@Override
 	public ClassTable visit(MainClass n) {
-		ClassTable result = new ClassTable();
+		ClassTable result = new ClassTable(n.i1.s);
 		
 		return result;
 	}
 
 	@Override
 	public ClassTable visit(ClassDeclSimple n) {
-		ClassTable result = new ClassTable();
+		ClassTable result = new ClassTable(n.i.s);
 		
 		try {			
 			for (int i = 0; i < n.vl.size(); i++) {
@@ -107,7 +107,7 @@ public class BuildTableVisitor implements TypeCheckVisitor {
 
 	@Override
 	public ClassTable visit(ClassDeclExtends n) {
-		ClassTable result = new ClassTable();
+		ClassTable result = new ClassTable(n.i.s);
 		
 		try {			
 			for (int i = 0; i < n.vl.size(); i++) {

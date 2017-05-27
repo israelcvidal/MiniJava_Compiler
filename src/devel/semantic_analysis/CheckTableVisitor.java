@@ -131,15 +131,26 @@ public class CheckTableVisitor implements TypeVisitor {
 		Type result = null;
 		
 		try {
-			result = currenMethod.getFormal(Symbol.symbol(n.i.s));
-			
-			try {
-				if (result == null)
-					throw new SemanticErrorException(n.i.s + " already defined!");
-			} catch (SemanticErrorException see) {
-				see.printStackTrace();
+			if (currenMethod == null) {
+				result = currenClass.getField(Symbol.symbol(n.i.s));
+				
+				try {
+					if (result == null)
+						throw new SemanticErrorException(n.i.s + " already defined!");
+				} catch (SemanticErrorException see) {
+					see.printStackTrace();
+				}
 			}
-			
+			else {
+				result = currenMethod.getFormal(Symbol.symbol(n.i.s));
+				
+				try {
+					if (result == null)
+						throw new SemanticErrorException(n.i.s + " already defined!");
+				} catch (SemanticErrorException see) {
+					see.printStackTrace();
+				}
+			}
 		} catch (SemanticErrorException see) { }
 		
 		return result;
@@ -167,6 +178,8 @@ public class CheckTableVisitor implements TypeVisitor {
 			Statement st = n.sl.elementAt(i);
 			st.accept(this);
 		}
+		
+		this.currenMethod = null;
 		
 		return null;
 	}
@@ -243,7 +256,7 @@ public class CheckTableVisitor implements TypeVisitor {
 	}
 	@Override
 	public Type visit(Assign n) {
-		Type expType; //debug
+		Type expType;
 		expType = n.e.accept(this);
 		Type idType = n.i.accept(this);
 		
@@ -253,8 +266,6 @@ public class CheckTableVisitor implements TypeVisitor {
 				if( !((idType instanceof BooleanType) && (expType instanceof BooleanType)) ) {
 					if( !((idType instanceof IntArrayType) && (expType instanceof IntArrayType)) ) {					
 						if ( !((idType instanceof IdentifierType) && (expType instanceof IdentifierType)) ) {
-							System.out.println(n.i.s);
-							System.out.println(expType==null);
 							throw new SemanticErrorException(n.i.s + " and " + expType.toString() + " must have same type to assign");
 						} else if (! (((IdentifierType)idType).s.equals(((IdentifierType) expType).s)) ) {
 							ClassTable leftTable = null;
@@ -529,7 +540,7 @@ public class CheckTableVisitor implements TypeVisitor {
 	}
 	@Override
 	public Type visit(This n) {
-		return null;
+		return new IdentifierType(currenClass.getId());
 	}
 	@Override
 	public Type visit(NewArray n) {

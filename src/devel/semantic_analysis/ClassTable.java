@@ -11,9 +11,18 @@ import core.abstract_syntax.syntaxtree.Type;
  */
 
 public class ClassTable {
+	private String i;
 	private ClassTable parentClass = null;
 	private TypeTable fieldTypeTable = new TypeTable();
 	private Table<MethodTable> methodTable = new Table<>();
+	
+	public ClassTable(String i) {
+		this.i = i;
+	}
+	
+	public String getId() {
+		return i;
+	}
 	
 	public void setParentClass(ClassTable parentClass) {
 		this.parentClass = parentClass;
