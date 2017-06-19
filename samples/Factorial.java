@@ -9,9 +9,10 @@ class Fac {
     public int ComputeFac(int num){
 	int num_aux ;
 	if (num < 1)
-	    num_aux = 1 ;
+	    num_aux = 50 ;
 	else 
-	    num_aux = num * (this.ComputeFac(num-1)) ;
+//	    num_aux = num * (this.ComputeFac(num-1)) ;
+		num_aux = 200;
 	return num_aux ;
     }
 

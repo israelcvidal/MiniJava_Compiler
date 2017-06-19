@@ -6,9 +6,11 @@ import core.activation_records.temp.Label;
 import core.activation_records.temp.Temp;
 import core.activation_records.temp.TempMap;
 import core.instruction_selection.assem.Instr;
+import core.instruction_selection.assem.InstrList;
 import core.translation_to_IR.tree.AbstractExp;
 import core.translation_to_IR.tree.ExpList;
 import core.translation_to_IR.tree.Stm;
+import core.translation_to_IR.tree.StmList;
 import devel.semantic_analysis.Symbol;
 
 public abstract class Frame implements TempMap {
@@ -24,7 +26,8 @@ public abstract class Frame implements TempMap {
     public abstract Label badPtr();
     public abstract Label badSub();
     public abstract String tempMap(Temp temp);
-    public abstract List<Instr> codegen(List<Stm> stms);
+//    public abstract List<Instr> codegen(List<Stm> stms);
+    public abstract InstrList codegen(StmList stms);
     public abstract void procEntryExit1(List<Stm> body);
     public abstract void procEntryExit2(List<Instr> body);
     public abstract void procEntryExit3(List<Instr> body);

@@ -23,4 +23,5 @@ public class Formal {
   public Type accept(TypeCheckVisitor v) {
 	  return v.visit(this);
   }
+
 }

@@ -19,6 +19,16 @@ public class ProgramTable {
 		return classTable.get(key);
 	}
 	
+	public ClassTable getClass(String id) {
+		try {
+			return classTable.get(Symbol.symbol(id));
+		} catch (SemanticErrorException see) {
+			see.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	public Enumeration<Symbol> keys() {
 		return classTable.keys();
 	}

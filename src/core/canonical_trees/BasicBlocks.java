@@ -35,7 +35,7 @@ public class BasicBlocks {
       }
   }
 
-  void mkBlocks(StmList l) {
+  public void mkBlocks(StmList l) {
      if (l==null) return;
      else if (l.head instanceof LABEL) {
 	lastStm = new StmList(l.head,null);

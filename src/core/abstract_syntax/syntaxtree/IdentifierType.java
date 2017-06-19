@@ -18,7 +18,4 @@ public class IdentifierType extends Type {
     return v.visit(this);
   }
   
-//  public Type accept(TypeCheckVisitor v) {
-//	  return v.visit(this);
-//  }
 }

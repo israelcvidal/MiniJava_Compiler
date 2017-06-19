@@ -12,6 +12,7 @@ import core.activation_records.temp.Label;
 import core.activation_records.temp.Temp;
 import core.activation_records.temp.TempList;
 import core.instruction_selection.assem.Instr;
+import core.instruction_selection.assem.InstrList;
 import core.instruction_selection.assem.OPER;
 import core.translation_to_IR.tree.AbstractExp;
 import core.translation_to_IR.tree.CALL;
@@ -21,9 +22,9 @@ import core.translation_to_IR.tree.MOVE;
 import core.translation_to_IR.tree.NAME;
 import core.translation_to_IR.tree.SEQ;
 import core.translation_to_IR.tree.Stm;
+import core.translation_to_IR.tree.StmList;
 import core.translation_to_IR.tree.TEMP;
 import devel.semantic_analysis.Symbol;
-import sun.reflect.generics.tree.Tree;
 
 public class MipsFrame extends Frame {
 
@@ -264,12 +265,17 @@ public class MipsFrame extends Frame {
 
     int maxArgOffset = 0;
 
-    public List<Instr> codegen(List<Stm> stms) {
-	List<Instr> insns = new LinkedList<Instr>();
-//	Codegen cg = new Codegen(this, insns.listIterator());
-//	for (java.util.Iterator<Stm> s = stms.iterator(); s.hasNext(); )
-//	    s.next().accept(cg);
-	return insns;
+    public InstrList codegen(StmList stms) {
+		Codegen cg = new Codegen(this);
+		
+		StmList s = stms;
+		
+		while (s != null) {
+			cg.codegen(s.head);
+			s = s.tail;
+		}
+		
+    	return cg.getCode();
     }
 
     private static <R> void addAll(java.util.Collection<R> c, R[] a) {

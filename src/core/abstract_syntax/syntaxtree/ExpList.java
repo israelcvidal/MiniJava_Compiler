@@ -3,7 +3,7 @@ package core.abstract_syntax.syntaxtree;
 import java.util.Vector;
 
 public class ExpList {
-   private Vector<Exp> list;
+   public Vector<Exp> list;
 
    public ExpList() {
       list = new Vector<>();
