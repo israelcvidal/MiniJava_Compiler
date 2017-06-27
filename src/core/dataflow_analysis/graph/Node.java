@@ -16,8 +16,8 @@ public class Node {
 		else g.mylast = g.mylast.tail = p;
 	}
 
-    NodeList succs;
-    NodeList preds;
+    NodeList succs = null;
+    NodeList preds = null;
     
     public NodeList succ() {return succs;}
     

@@ -42,7 +42,7 @@ public class Graph {
  /**
   * Print a human-readable dump for debugging.
   */
-     public void show(java.io.PrintStream out) {
+  public void show(java.io.PrintStream out) {
 	for (NodeList p=nodes(); p!=null; p=p.tail) {
 	  Node n = p.head;
 	  out.print(n.toString());
