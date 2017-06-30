@@ -10,19 +10,19 @@ public class LivenessGraph extends FlowGraph{
 	@Override
 	public TempList def(Node node) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.getDefs();
 	}
 
 	@Override
 	public TempList use(Node node) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.getUses();
 	}
 
 	@Override
 	public boolean isMove(Node node) {
 		// TODO Auto-generated method stub
-		return false;
+		return node.getMoves().labels.head!=null;
 	}
 
 }

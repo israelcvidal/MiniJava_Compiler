@@ -1,20 +1,38 @@
 package core.dataflow_analysis.graph;
 
+import core.activation_records.temp.TempList;
+import core.instruction_selection.assem.Instr;
+import core.instruction_selection.assem.Targets;
+
 public class Node {
 
     Graph mygraph;
     @SuppressWarnings("unused")
 	private Node(){}
     int mykey;
+    private Instr instruction;
     
-    public Node(Graph g) {
-		mygraph=g; 
+    public Node(Graph g, Instr instruction) {
+		mygraph=g;
+		this.instruction = instruction;
 		mykey= g.nodecount++;
 		NodeList p = new NodeList(this, null);
 		if (g.mylast==null)
 		   g.mynodes=g.mylast=p;
 		else g.mylast = g.mylast.tail = p;
 	}
+    
+    public TempList getUses(){
+    	return instruction.use();
+    }
+    
+    public TempList getDefs(){
+    	return instruction.def();
+    }
+    
+    public Targets getMoves(){
+    	return instruction.jumps();
+    }
 
     NodeList succs = null;
     NodeList preds = null;

@@ -1,13 +1,15 @@
 package core.dataflow_analysis.graph;
 
+import core.instruction_selection.assem.Instr;
+
 public class Graph {
 
   int nodecount=0;
   NodeList mynodes, mylast;
   public NodeList nodes() { return mynodes;} 
 
-  public Node newNode() {
-	return new Node(this);
+  public Node newNode(Instr instruction) {
+	return new Node(this, instruction);
   }
 
   void check(Node n) {
