@@ -12,6 +12,9 @@ public class Node {
     int mykey;
     private Instr instruction;
     
+    public Instr getInstruction(){
+    	return this.instruction;
+    }
     public Node(Graph g, Instr instruction) {
 		mygraph=g;
 		this.instruction = instruction;
