@@ -27,6 +27,7 @@ public class AssemFlowGraph extends FlowGraph{
 			
 			Instr instr = instrs.head;
 			Node node = flowGraph.newNode(instr);
+			
 						
 //			if the instruction is an label, add the map label=>node to the hashMap
 			if(instr.getClass() == LABEL.class)
@@ -71,22 +72,17 @@ public class AssemFlowGraph extends FlowGraph{
 		}	
 	}
 	
-	@Override
 	public TempList def(Node node) {
-		// TODO Auto-generated method stub
-		return null;
+		return node.getDefs();
 	}
 
-	@Override
 	public TempList use(Node node) {
-		// TODO Auto-generated method stub
-		return null;
+		return node.getUses();
 	}
 
 	@Override
 	public boolean isMove(Node node) {
-		// TODO Auto-generated method stub
-		return false;
+		return this.instr(node).getClass() == MOVE.class;
 	}
 
 }
