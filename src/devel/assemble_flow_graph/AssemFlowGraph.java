@@ -80,7 +80,6 @@ public class AssemFlowGraph extends FlowGraph{
 		return node.getUses();
 	}
 
-	@Override
 	public boolean isMove(Node node) {
 		return this.instr(node).getClass() == MOVE.class;
 	}
