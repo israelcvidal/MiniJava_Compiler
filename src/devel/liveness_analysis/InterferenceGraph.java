@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class InterferenceGraph<T>{
+public class InterferenceGraph<Temp>{
 
-	private HashMap<T,ArrayList<T>> interferences;
-	private HashMap<T,ArrayList<T>> moves;
+	private HashMap<Temp,ArrayList<Temp>> interferences;
+	private HashMap<Temp,ArrayList<Temp>> moves;
 	private int significativeDegree;
 	
 	public InterferenceGraph(int degree){
@@ -16,65 +16,65 @@ public class InterferenceGraph<T>{
 		significativeDegree = degree;
 	}
 	
-	public void addInterference(T a, T b){
+	public void addInterference(Temp a, Temp b){
 		if(!interferences.containsKey(a)){
-			interferences.put(a, new ArrayList<T>());
+			interferences.put(a, new ArrayList<Temp>());
 		}
-		ArrayList<T> l = interferences.get(a);
+		ArrayList<Temp> l = interferences.get(a);
 		l.add(b);
 		interferences.put(a,l);
 		
 		if(!interferences.containsKey(b)){
-			interferences.put(b, new ArrayList<T>());
+			interferences.put(b, new ArrayList<Temp>());
 		}
 		l = interferences.get(b);
 		l.add(a);
 		interferences.put(b,l);
 	}
 	
-	public void addMove(T a, T b){
+	public void addMove(Temp a, Temp b){
 		if(!moves.containsKey(a)){
-			moves.put(a, new ArrayList<T>());
+			moves.put(a, new ArrayList<Temp>());
 		}
-		ArrayList<T> l = moves.get(a);
+		ArrayList<Temp> l = moves.get(a);
 		l.add(b);
 		moves.put(a,l);
 		
 		if(!moves.containsKey(b)){
-			moves.put(b, new ArrayList<T>());
+			moves.put(b, new ArrayList<Temp>());
 		}
 		l = moves.get(b);
 		l.add(a);
 		moves.put(b,l);
 	}
 	
-	public ArrayList<T> getInterferences(T a){
-		return interferences.getOrDefault(a, new ArrayList<T>());
+	public ArrayList<Temp> getInterferences(Temp a){
+		return interferences.getOrDefault(a, new ArrayList<Temp>());
 	}
 	
-	public ArrayList<T> getMoves(T a){
-		return moves.getOrDefault(a, new ArrayList<T>());
+	public ArrayList<Temp> getMoves(Temp a){
+		return moves.getOrDefault(a, new ArrayList<Temp>());
 	}
 	
-	public int degreeOf(T a){
+	public int degreeOf(Temp a){
 		return interferences.get(a).size();
 	}
 	
-	public boolean hasInterference(T a, T b){
+	public boolean hasInterference(Temp a, Temp b){
 		return interferences.get(a).contains(b);
 	}
 	
-	public boolean hasMove(T a, T b){
+	public boolean hasMove(Temp a, Temp b){
 		return moves.get(a).contains(b);
 	}
 
-	public boolean George(T a, T b){
-		ArrayList<T> neighs = interferences.get(a);
+	public boolean George(Temp a, Temp b){
+		ArrayList<Temp> neighs = interferences.get(a);
 		int cont = 0;
 		
 		for(int i=0; i<neighs.size(); i++){
 			//the temp is neighbor of b
-			T n = neighs.get(i);
+			Temp n = neighs.get(i);
 			if(hasInterference(b, n))
 				cont++;
 			else
@@ -91,7 +91,7 @@ public class InterferenceGraph<T>{
 		cont = 0;
 		for(int i=0; i<neighs.size(); i++){
 			//the edge is neighbor of b
-			T n = neighs.get(i);
+			Temp n = neighs.get(i);
 			if(hasInterference(a, n))
 				cont++;
 			else
@@ -108,18 +108,18 @@ public class InterferenceGraph<T>{
 		return false;
 	}
 	
-	public boolean Briggs(T a, T b){
+	public boolean Briggs(Temp a, Temp b){
 		
-		HashSet<T> newNeighs = new HashSet<>();
-		for(T n : interferences.get(a))
+		HashSet<Temp> newNeighs = new HashSet<>();
+		for(Temp n : interferences.get(a))
 			newNeighs.add(n);
 		
-		for(T n : interferences.get(a))
+		for(Temp n : interferences.get(a))
 			newNeighs.add(n);
 		
 		int significantNeigh = 0;
 		
-		for(T n : newNeighs){
+		for(Temp n : newNeighs){
 			//check if has significative degree
 			if(degreeOf(n)>=significativeDegree){
 				//if has interference with both nodes, the degree should be decreased by one
@@ -138,13 +138,13 @@ public class InterferenceGraph<T>{
 		return false;
 	}
 
-	public void removeNode(T a){
+	public void removeNode(Temp a){
 		interferences.remove(a);
-		for(T k : interferences.keySet())
+		for(Temp k : interferences.keySet())
 			interferences.get(k).remove(a);
 		
 		moves.remove(a);
-		for(T k : moves.keySet())
+		for(Temp k : moves.keySet())
 			moves.get(k).remove(a);
 		
 	}
