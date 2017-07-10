@@ -246,7 +246,27 @@ public class Liveness extends InterferenceGraph {
 		
 		return false;
 	}
-
+	
+	public boolean canSimplify(Temp a){
+		return degreeOf(a)<significativeDegree && (!moves.containsKey(a) || moves.get(a).size()==0);
+	}
+	
+	public boolean canFreeze(Temp a){
+		return moves.get(a).size()>0 && degreeOf(a)<significativeDegree;
+	}
+	
+	public int getNumReg(){
+		return significativeDegree;
+	}
+	
+	public ArrayList<Temp> getNodes(){
+		return new ArrayList<>(interferences.keySet());
+	}
+	
+	public void merge(Temp a, Temp b){
+		//TODO join 2 temps into 1 node
+	}
+	
 	public void removeNode(Temp a){
 		interferences.remove(a);
 		for(Temp k : interferences.keySet())
