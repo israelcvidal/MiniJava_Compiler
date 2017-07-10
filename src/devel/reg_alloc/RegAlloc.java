@@ -12,38 +12,39 @@ public class RegAlloc {
 		int k = graph.getNumReg();
 		Liveness workingGraph = graph;
 		HashMap<Temp,Integer> colors = new HashMap<>();
-		Stack<Temp> stack = new Stack<>();
+		Stack<String> simplifyStack = new Stack<>();
+		Stack<String> spillStack = new Stack<>();
+		Stack<String> freezeStack = new Stack<>();
 		boolean change = true;
 		
 		//trying to make changes on the graph
 		while(change){
 			change = false;
-			for(Temp t1 : workingGraph.getNodes()){
+			for(String n1 : workingGraph.getNodes()){
 				//simplify
-				if(workingGraph.canSimplify(t1)){
-					workingGraph.removeNode(t1);
-					stack.add(t1);
+				if(workingGraph.canSimplify(n1)){
+					workingGraph.removeNode(n1);
+					simplifyStack.add(n1);
 					change = true;
 				}
 				else{
-					for(Temp t2 : workingGraph.getMoves(t1)){
+					for(String n2 : workingGraph.getMoves(n1)){
 						//merging
-						if((workingGraph.Briggs(t1, t2) || workingGraph.George(t1, t2)) && !workingGraph.hasInterference(t1, t2)){
-							workingGraph.merge(t1, t2);
+						if((workingGraph.Briggs(n1, n2) || workingGraph.George(n1, n2)) && !workingGraph.hasInterference(n1, n2)){
+							workingGraph.merge(n1, n2);
 							change = true;
 						}
 						else{
 							//freeze
-							if(workingGraph.canFreeze(t1)){
-								workingGraph.removeNode(t1);
-								stack.add(t1);
+							if(workingGraph.canFreeze(n1)){
+								workingGraph.removeNode(n1);
+								freezeStack.add(n1);
 								change = true;
 							}
 							//spill
 							else{
-								workingGraph.removeNode(t1);
-								t1.spillTemp = true;
-								stack.add(t1);
+								workingGraph.removeNode(n1);
+								spillStack.add(n1);
 							}
 						}
 					}
@@ -51,25 +52,55 @@ public class RegAlloc {
 			}
 		}
 		
-		while(!stack.isEmpty()){
-			Temp t = stack.pop();
+		//coloring temps from simplify stack
+		while(!simplifyStack.isEmpty()){
+			String temps = simplifyStack.pop();
 			
-			HashSet<Integer> neighColors = new HashSet<>();
-			
-			//checking wich colors are beeing used
-			for(Temp n : graph.getInterferences(t)){
-				if(colors.containsKey(n))
-					neighColors.add(colors.get(t));
-			}
-			
-			if(neighColors.size()==graph.getNumReg()){
-				//TODO SPILL
-			}
-			else{
-				for(int i = 0; i<graph.getNumReg();i++){
+			//In case of merged nodes, analyse each temp
+			for(String t : temps.split(",")){
+				HashSet<Integer> neighColors = new HashSet<>();
+				
+				//checking wich colors are beeing used
+				for(String n : graph.getInterferences(t)){
+					if(colors.containsKey(n))
+						neighColors.add(colors.get(t));
+				}
+				
+				for(int i = 0; i<k;i++){
 					if(!neighColors.contains(i)){
-						colors.put(t, i);
+						colors.put(new Temp(
+								Integer.parseInt(t.replace("t", ""))), i);
 						break;
+					}
+				}
+			}
+		}
+		
+		//coloring temps from freeze stack
+		while(!freezeStack.isEmpty()){
+			String temps = simplifyStack.pop();
+			
+			//In case of merged nodes, analyse each temp
+			for(String t : temps.split(",")){
+				HashSet<Integer> neighColors = new HashSet<>();
+				
+				//checking wich colors are beeing used
+				for(String n : graph.getInterferences(t)){
+					if(colors.containsKey(n))
+						neighColors.add(colors.get(t));
+				}
+				
+				if(neighColors.size()==k){
+					//TODO SPILL
+				}
+				
+				else{
+					for(int i = 0; i<k;i++){
+						if(!neighColors.contains(i)){
+							colors.put(new Temp(
+									Integer.parseInt(t.replace("t", ""))), i);
+							break;
+						}
 					}
 				}
 			}
