@@ -150,17 +150,17 @@ public class Main {
 		   AssemFlowGraph afg = new AssemFlowGraph(allInstr);
 		   
 //		   Printing flowGraph
-		   for(NodeList nl = afg.nodes(); nl!=null; nl=nl.tail){
-//			   System.out.println(nl.head.getInstruction().assem);
-			   for (NodeList p = nl.head.succ(); p!=null; p = p.tail) {
-				   System.out.println(nl.head.getInstruction().assem + " -> " + p.head.getInstruction().assem);
-				   System.out.println("--------------");
-			   }
-		   }
+//		   for(NodeList nl = afg.nodes(); nl!=null; nl=nl.tail){
+////			   System.out.println(nl.head.getInstruction().assem);
+//			   for (NodeList p = nl.head.succ(); p!=null; p = p.tail) {
+//				   System.out.println(nl.head.getInstruction().assem + " -> " + p.head.getInstruction().assem);
+//				   System.out.println("--------------");
+//			   }
+//		   }
 		  
 		   
 
-//		   Liveness ig = new Liveness(afg);
+		   Liveness ig = new Liveness(afg);
 		   
 		   // Allocate registers to temps
 		   

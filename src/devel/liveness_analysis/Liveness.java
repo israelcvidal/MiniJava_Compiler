@@ -35,6 +35,8 @@ public class Liveness extends InterferenceGraph {
 			liveOut.put(node, new ArrayList<Temp>());
 		}
 		while(changed){
+			changed = false;
+			
 			for(NodeList nodes = this.flowGraph.nodes(); nodes!=null; nodes=nodes.tail){
 				Node node = nodes.head;
 				ArrayList<Temp> in = liveIn.get(node);
@@ -77,11 +79,11 @@ public class Liveness extends InterferenceGraph {
 //				adding out-def to in
 				in.addAll(outMinusDef);
 				
-				changed = in.size() > in_.size() || out.size() > out_.size();
-				if(changed){
-					liveIn.put(node, in);
-					liveOut.put(node, out);
-				}
+				changed = changed || in.size() > in_.size() || out.size() > out_.size();
+				
+				liveIn.put(node, in);
+				liveOut.put(node, out);
+				
 			}	
 		}
 		
@@ -94,12 +96,14 @@ public class Liveness extends InterferenceGraph {
 			
 			for(Temp t1 : liveIn.get(n)){
 				for(Temp t2 : liveIn.get(n)){
-					if(!t1.toString().equals(t2.toString())){
-						addInterference(t1, t2);
-						//check if is a Move instruction
-						if(this.flowGraph.isMove(n)){
-							//adding move edge
-							addMove(t1, t2);
+					if(t1!=null && t2 != null){
+						if(!t1.toString().equals(t2.toString())){
+							addInterference(t1, t2);
+							//check if is a Move instruction
+							if(this.flowGraph.isMove(n)){
+								//adding move edge
+								addMove(t1, t2);
+							}
 						}
 					}
 				}
