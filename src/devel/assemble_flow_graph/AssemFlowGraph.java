@@ -12,7 +12,6 @@ import core.dataflow_analysis.graph.NodeList;
 import core.instruction_selection.assem.*;
 
 public class AssemFlowGraph extends FlowGraph{
-	private Graph flowGraph = new Graph();
 	
 	public Instr instr(Node n){
 		
@@ -25,7 +24,7 @@ public class AssemFlowGraph extends FlowGraph{
 		for(InstrList p=instrs; p!=null; p=p.tail){
 			
 			Instr instr = p.head;
-			Node node = flowGraph.newNode(instr);
+			Node node = this.newNode(instr);
 			
 						
 //			if the instruction is an label, add the map label=>node to the hashMap
@@ -45,20 +44,20 @@ public class AssemFlowGraph extends FlowGraph{
 				instr_b = p.tail.head;
 				
 //			Getting node from instr_a
-			for(NodeList nodes = flowGraph.nodes(); nodes!= null && node_a == null; nodes=nodes.tail){
+			for(NodeList nodes = this.nodes(); nodes!= null && node_a == null; nodes=nodes.tail){
 				if(instr(nodes.head) == instr_a)
 					node_a = nodes.head;
 			}
 			
 //			Getting node from instr_b
-			for(NodeList nodes = flowGraph.nodes(); nodes!= null && node_b == null; nodes=nodes.tail){
+			for(NodeList nodes = this.nodes(); nodes!= null && node_b == null; nodes=nodes.tail){
 				if(instr(nodes.head) == instr_b)
 					node_b = nodes.head;
 			}
 			
 //			Adding edge to next instruction in list
 			if(node_b != null)
-				flowGraph.addEdge(node_a, node_b);
+				this.addEdge(node_a, node_b);
 			
 			node_b = null;
 //			Adding edge to the label instr_a jumps to 
@@ -68,7 +67,7 @@ public class AssemFlowGraph extends FlowGraph{
 					Label label_b = targets.head;
 					node_b = labelMap.get(label_b);
 					if(node_b != null)
-						flowGraph.addEdge(node_a, node_b);
+						this.addEdge(node_a, node_b);
 				}
 			}
 			

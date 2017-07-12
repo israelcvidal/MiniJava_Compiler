@@ -147,7 +147,7 @@ public class Main {
 		   // Generate FlowGraph and InterferenceGraph
 		   AssemFlowGraph afg = new AssemFlowGraph(allInstr);
 		   
-//		   Liveness ig = new Liveness(afg);
+		   Liveness ig = new Liveness(afg);
 		   
 		   // Allocate registers to temps
 		   
