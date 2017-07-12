@@ -1,6 +1,7 @@
 package devel.liveness_analysis;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,7 +35,9 @@ public class Liveness extends InterferenceGraph {
 			liveIn.put(node, new ArrayList<Temp>());
 			liveOut.put(node, new ArrayList<Temp>());
 		}
+		int count = 0;
 		while(changed){
+			count++;
 			changed = false;
 			
 			for(NodeList nodes = this.flowGraph.nodes(); nodes!=null; nodes=nodes.tail){
@@ -43,8 +46,10 @@ public class Liveness extends InterferenceGraph {
 				ArrayList<Temp> out = liveOut.get(node);
 				
 //				in'= in and out'= out
-				ArrayList<Temp> in_ = in;
-				ArrayList<Temp> out_ = out;
+				ArrayList<Temp> in_ = new ArrayList<Temp>();
+				ArrayList<Temp> out_ = new ArrayList<Temp>();
+				in_.addAll(in);
+				out_.addAll(out);
 				
 				ArrayList<Temp> uses = new ArrayList<Temp>();
 				ArrayList<Temp> defs = new ArrayList<Temp>();
@@ -79,13 +84,21 @@ public class Liveness extends InterferenceGraph {
 //				adding out-def to in
 				in.addAll(outMinusDef);
 				
-				changed = changed || in.size() > in_.size() || out.size() > out_.size();
-				
 				liveIn.put(node, in);
 				liveOut.put(node, out);
 				
+				changed = changed || in.size() > in_.size() || out.size() > out_.size();
+
+				
 			}	
 		}
+//		Enumeration<Node> keys = liveIn.keys();
+//		while(keys.hasMoreElements()){
+//			Node key = keys.nextElement();
+//			System.out.println(key + ":" + liveIn.get(key));
+//		}
+		
+		System.out.println(count);
 		
 		//Building interference graph
 		
@@ -116,12 +129,14 @@ public class Liveness extends InterferenceGraph {
 			
 			for(Temp t1 : liveOut.get(n)){
 				for(Temp t2 : liveOut.get(n)){
-					if(!t1.toString().equals(t2.toString())){
-						addInterference(t1, t2);
-						//check if is a Move instruction
-						if(this.flowGraph.isMove(n)){
-							//adding move edge
-							addMove(t1, t2);
+					if(t1!=null && t2 != null){
+						if(!t1.toString().equals(t2.toString())){
+							addInterference(t1, t2);
+							//check if is a Move instruction
+							if(this.flowGraph.isMove(n)){
+								//adding move edge
+								addMove(t1, t2);
+							}
 						}
 					}
 				}

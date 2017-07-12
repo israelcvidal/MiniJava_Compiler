@@ -162,6 +162,7 @@ public class Main {
 
 		   Liveness ig = new Liveness(afg);
 		   
+		   
 		   // Allocate registers to temps
 		   
 	   	} catch (ParseException e) {
