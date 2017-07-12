@@ -71,7 +71,7 @@ public class Liveness extends InterferenceGraph {
 					Node succ = succs.head;
 					inSucc.addAll(liveIn.get(succ));
 				}
-				out = inSucc;
+				out.addAll(inSucc);
 				
 //				adding use U out - def to in[node]
 				in.addAll(uses);
