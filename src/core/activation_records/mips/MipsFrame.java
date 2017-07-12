@@ -13,7 +13,7 @@ import core.activation_records.temp.Temp;
 import core.activation_records.temp.TempList;
 import core.instruction_selection.assem.Instr;
 import core.instruction_selection.assem.InstrList;
-import core.instruction_selection.assem.OPER;
+import core.instruction_selection.assem.OPER_ASSEM;
 import core.translation_to_IR.tree.AbstractExp;
 import core.translation_to_IR.tree.CALL;
 import core.translation_to_IR.tree.CONST;
@@ -130,10 +130,10 @@ public class MipsFrame extends Frame {
     static final Temp AT = new Temp(); // reserved for assembler
     static final Temp V0 = new Temp(); // function result
     static final Temp V1 = new Temp(); // second function result
-    static final Temp A0 = new Temp(); // argument1
-    static final Temp A1 = new Temp(); // argument2
-    static final Temp A2 = new Temp(); // argument3
-    static final Temp A3 = new Temp(); // argument4
+    public static final Temp A0 = new Temp(); // argument1
+    public static final Temp A1 = new Temp(); // argument2
+    public static final Temp A2 = new Temp(); // argument3
+    public static final Temp A3 = new Temp(); // argument4
     static final Temp T0 = new Temp(); // caller-saved
     static final Temp T1 = new Temp();
     static final Temp T2 = new Temp();
@@ -174,7 +174,8 @@ public class MipsFrame extends Frame {
     static final Temp FP = new Temp(); // virtual frame pointer (eliminated)
     public Temp FP() { return FP; }
     public Temp RV() { return V0; }
-
+    public Temp SP() { return SP; }
+    public Temp ZERO() { return ZERO; }
     private static HashMap<String,Label> labels = new HashMap<String,Label>();
     public AbstractExp externalCall(String s, ExpList args) {
 	String func = s.intern();
@@ -347,7 +348,7 @@ public class MipsFrame extends Frame {
     }
 
     private static Instr OPER(String a, TempList d, TempList s) {
-    	return new OPER(a, d, s);
+    	return new OPER_ASSEM(a, d, s);
     }
 
     public void procEntryExit2(List<Instr> body) {

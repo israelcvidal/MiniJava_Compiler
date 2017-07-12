@@ -4,15 +4,15 @@ import core.activation_records.temp.LabelList;
 import core.activation_records.temp.Temp;
 import core.activation_records.temp.TempList;
 
-public class OPER extends Instr {
+public class OPER_ASSEM extends Instr {
    public TempList dst;   
    public TempList src;
    public Targets jump;
 
-   public OPER(String a, TempList d, TempList s, LabelList j) {
+   public OPER_ASSEM(String a, TempList d, TempList s, LabelList j) {
       assem=a; dst=d; src=s; jump=new Targets(j);
    }
-   public OPER(String a, TempList d, TempList s) {
+   public OPER_ASSEM(String a, TempList d, TempList s) {
       assem=a; dst=d; src=s; jump=null;
    }
 

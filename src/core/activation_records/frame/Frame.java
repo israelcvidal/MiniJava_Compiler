@@ -19,6 +19,7 @@ public abstract class Frame implements TempMap {
     public abstract Frame newFrame(Symbol name, List<Boolean> formals);
     public abstract Access allocLocal(boolean escape);
     public abstract Temp FP();
+    public abstract Temp SP();
     public abstract int wordSize();
     public abstract AbstractExp externalCall(String func, ExpList args);
     public abstract Temp RV();
@@ -32,6 +33,7 @@ public abstract class Frame implements TempMap {
     public abstract void procEntryExit2(List<Instr> body);
     public abstract void procEntryExit3(List<Instr> body);
     public abstract Temp[] registers();
+    public abstract Temp ZERO();
     public abstract void spill(List<Instr> insns, Temp[] spills);
     public abstract String programTail(); //append to end of target code
 }

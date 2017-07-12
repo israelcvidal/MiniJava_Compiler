@@ -3,6 +3,7 @@ package devel.main_test;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import core.abstract_syntax.syntaxtree.*;
@@ -10,11 +11,15 @@ import core.activation_records.mips.MipsFrame;
 import core.canonical_trees.BasicBlocks;
 import core.canonical_trees.Canon;
 import core.canonical_trees.TraceSchedule;
+import core.instruction_selection.assem.Instr;
+import core.instruction_selection.assem.InstrList;
 import core.lexical_analysis.MiniJavaParser;
 import core.lexical_analysis.ParseException;
 import devel.IR_translation.Frag;
 import devel.IR_translation.ProcFrag;
 import devel.IR_translation.TranslateVisitor;
+import devel.assemble_flow_graph.AssemFlowGraph;
+import devel.liveness_analysis.Liveness;
 import devel.semantic_analysis.BuildTableVisitor;
 import devel.semantic_analysis.CheckTableVisitor;
 import devel.semantic_analysis.ProgramTable;
@@ -71,40 +76,80 @@ public class Main {
 //				   
 //			   }
 		   
-		   // Generate canonical IR tree and Basic Blocks
-		   BasicBlocks bb = new BasicBlocks(Canon.linearize(((ProcFrag) frags.get(0)).getBody()));
+		   // Compute canonical IR tree, Basic Blocks and Trace for each Frag.
+		   List<StmList> traces = new LinkedList<>();
 		   
-		   for (int i = 1; i < frags.size(); i++) {
+		   for (int i = 0; i < frags.size(); i++) {
 			   Frag f = frags.get(i);
 			   
 			   if (f instanceof ProcFrag) {
 				   ProcFrag pf = (ProcFrag) f;
-				   StmList sl = Canon.linearize(pf.getBody());
+				   BasicBlocks bb = new BasicBlocks(Canon.linearize((pf).getBody()));
+				   TraceSchedule ts = new TraceSchedule(bb);
+				   traces.add(ts.stms);
+			   }
+			   
+		   }
+		   
+		   // Tiling IR trees for each Frag and generate a instructions program's list.
+		   InstrList allInstr = new InstrList(null, null);
+		   InstrList allInstrIt = allInstr, allInstrIt_ = allInstrIt;
+		   
+		   for (int i = 0; i < frags.size(); i++) {
+			   Frag f = frags.get(i);
+			   
+			   List<Instr> bodyList = new LinkedList<>();
+			   
+			   if (f instanceof ProcFrag) {
+				   ProcFrag pf = (ProcFrag) f;
+				   StmList stms = traces.get(i);
+				   InstrList body = pf.getFrame().codegen(stms);
 				   
-				   bb.mkBlocks(sl);
+				   InstrList insIt = body;
 				   
-				   //Print canonical IR trees without frag[0].
-//				   StmList s = sl;
-//				   
-//				   while (s != null) {
-//					   new Print(System.out).prStm(s.head);
-//					   s = s.tail;
-//				   }
+				   while (insIt != null) {
+					   bodyList.add(insIt.head);
+					   insIt = insIt.tail;
+				   }
+				   
+				   pf.getFrame().procEntryExit2(bodyList);
+				   pf.getFrame().procEntryExit3(bodyList);
+				   
+				   allInstrIt.head = bodyList.get(0);
+				   allInstrIt_ = allInstrIt;
+				   allInstrIt = allInstrIt.tail = new InstrList(null, null);
+				   
+				   for (int j = 1; j < bodyList.size(); j++) {
+					   allInstrIt.head = bodyList.get(j);
+					   allInstrIt_ = allInstrIt;
+					   allInstrIt = allInstrIt.tail = new InstrList(null, null);
+				   }
 				   
 			   }
+			   
+			   // Print each instructions' frag
+//			   for (Instr ins : bodyList) {
+//				   System.out.println(ins.assem);
+//			   }
 		   }
 		   
-		   //Generate Trace
-		   TraceSchedule ts = new TraceSchedule(bb);
+		   allInstrIt_.tail = null;
 		   
-		   StmList s = ts.stms; //trace
 		   
-		   //Print Trace
-		   while (s != null) {
-			   new Print(System.out).prStm(s.head);
-			   s = s.tail;
+		   //Print all of instructions' program
+		   InstrList printInst = allInstr;
+		   
+		   while (printInst != null) {
+			   System.out.println(printInst.head.assem);
+			   printInst = printInst.tail;
 		   }
 		   
+		   // Generate FlowGraph and InterferenceGraph
+		   AssemFlowGraph afg = new AssemFlowGraph(allInstr);
+		   
+//		   Liveness ig = new Liveness(afg);
+		   
+		   // Allocate registers to temps
 		   
 	   	} catch (ParseException e) {
 	   		System.out.println(e.toString());

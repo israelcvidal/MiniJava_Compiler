@@ -1,6 +1,5 @@
 package devel.assemble_flow_graph;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import core.activation_records.temp.Label;
@@ -13,7 +12,7 @@ import core.dataflow_analysis.graph.NodeList;
 import core.instruction_selection.assem.*;
 
 public class AssemFlowGraph extends FlowGraph{
-	private FlowGraph flowGraph = null;
+	private Graph flowGraph = new Graph();
 	
 	public Instr instr(Node n){
 		
@@ -25,25 +24,25 @@ public class AssemFlowGraph extends FlowGraph{
 
 		for(InstrList p=instrs; p!=null; p=p.tail){
 			
-			Instr instr = instrs.head;
+			Instr instr = p.head;
 			Node node = flowGraph.newNode(instr);
 			
 						
 //			if the instruction is an label, add the map label=>node to the hashMap
-			if(instr.getClass() == LABEL.class)
-				labelMap.put(((LABEL)instr).label, node);
+			if(instr.getClass() == LABEL_ASSEM.class)
+				labelMap.put(((LABEL_ASSEM)instr).label, node);
 		}
 		
 //		Now we hash the map of all label instructions to its nodes. The we add the 
 		for(InstrList p=instrs; p!=null; p=p.tail){
 			
-			Instr instr_a = instrs.head;
+			Instr instr_a = p.head;
 			Instr instr_b = null;
 			Node node_a = null;
 			Node node_b = null;
 
-			if(instrs.tail!= null)
-				instr_b = instrs.tail.head;
+			if(p.tail!= null)
+				instr_b = p.tail.head;
 				
 //			Getting node from instr_a
 			for(NodeList nodes = flowGraph.nodes(); nodes!= null && node_a == null; nodes=nodes.tail){
@@ -63,12 +62,16 @@ public class AssemFlowGraph extends FlowGraph{
 			
 			node_b = null;
 //			Adding edge to the label instr_a jumps to 
-			for( LabelList targets = instr_a.jumps().labels; targets!=null; targets = targets.tail){
-				Label label_b = targets.head;
-				node_b = labelMap.get(label_b);
-				if(node_b != null)
-					flowGraph.addEdge(node_a, node_b);
+
+			if (instr_a.jumps() != null) {
+				for(LabelList targets = instr_a.jumps().labels; targets!=null; targets = targets.tail){
+					Label label_b = targets.head;
+					node_b = labelMap.get(label_b);
+					if(node_b != null)
+						flowGraph.addEdge(node_a, node_b);
+				}
 			}
+			
 		}	
 	}
 	
@@ -81,7 +84,7 @@ public class AssemFlowGraph extends FlowGraph{
 	}
 
 	public boolean isMove(Node node) {
-		return this.instr(node).getClass() == MOVE.class;
+		return this.instr(node).getClass() == MOVE_ASSEM.class;
 	}
 
 }
