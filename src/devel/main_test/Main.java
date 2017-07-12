@@ -3,6 +3,7 @@ package devel.main_test;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import core.activation_records.mips.MipsFrame;
 import core.canonical_trees.BasicBlocks;
 import core.canonical_trees.Canon;
 import core.canonical_trees.TraceSchedule;
+import core.dataflow_analysis.graph.NodeList;
 import core.instruction_selection.assem.Instr;
 import core.instruction_selection.assem.InstrList;
 import core.lexical_analysis.MiniJavaParser;
@@ -139,15 +141,26 @@ public class Main {
 		   //Print all of instructions' program
 		   InstrList printInst = allInstr;
 		   
-		   while (printInst != null) {
-			   System.out.println(printInst.head.assem);
-			   printInst = printInst.tail;
-		   }
-		   
+//		   while (printInst != null) {
+//			   System.out.println(printInst.head.assem);
+//			   printInst = printInst.tail;
+//		   }
+//		   
 		   // Generate FlowGraph and InterferenceGraph
 		   AssemFlowGraph afg = new AssemFlowGraph(allInstr);
 		   
-		   Liveness ig = new Liveness(afg);
+//		   Printing flowGraph
+		   for(NodeList nl = afg.nodes(); nl!=null; nl=nl.tail){
+//			   System.out.println(nl.head.getInstruction().assem);
+			   for (NodeList p = nl.head.succ(); p!=null; p = p.tail) {
+				   System.out.println(nl.head.getInstruction().assem + " -> " + p.head.getInstruction().assem);
+				   System.out.println("--------------");
+			   }
+		   }
+		  
+		   
+
+//		   Liveness ig = new Liveness(afg);
 		   
 		   // Allocate registers to temps
 		   
