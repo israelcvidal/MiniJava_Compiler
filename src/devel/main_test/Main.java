@@ -158,10 +158,10 @@ public class Main {
 //			   }
 //		   }
 		  
-		   
-
 		   Liveness ig = new Liveness(afg);
-		   
+		   for(String node: ig.getNodes()){
+			   System.out.println(ig.getInterferences(node));
+		   }
 		   
 		   // Allocate registers to temps
 		   
