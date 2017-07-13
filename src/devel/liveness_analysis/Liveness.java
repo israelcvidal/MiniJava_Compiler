@@ -146,8 +146,15 @@ public class Liveness extends InterferenceGraph {
 		this.liveIn = graph.getLiveIn();
 		this.liveOut = graph.getLiveOut();
 		this.flowGraph = graph.getFlowGraph();
-		this.interferences = (HashMap<String, HashSet<String>>)graph.getInterferences().clone();
-		this.moves = (HashMap<String, HashSet<String>>)graph.getMoves().clone();
+		
+		this.interferences = new HashMap<>();
+		for(Map.Entry<String, HashSet<String>> entry : graph.getInterferences().entrySet())
+			this.interferences.put(entry.getKey(), entry.getValue());
+		
+		this.moves = new HashMap<>();
+		for(Map.Entry<String, HashSet<String>> entry : graph.getMoves().entrySet())
+			this.moves.put(entry.getKey(), entry.getValue());
+		
 		this.significativeDegree = graph.getSignificativeDegree();
 	}
 	
@@ -179,20 +186,22 @@ public class Liveness extends InterferenceGraph {
 		addInterference(a.toString(), b.toString());
 	}
 	
-	public void addInterference(String a, String b){		
+	public void addInterference(String a, String b){
+		HashSet<String> t;
+		
 		if(!interferences.containsKey(a)){
 			interferences.put(a, new HashSet<String>());
 		}
-		HashSet<String> l = interferences.get(a);
-		l.add(b);
-		interferences.put(a,l);
-		
+		interferences.get(a).add(b);
 		if(!interferences.containsKey(b)){
 			interferences.put(b, new HashSet<String>());
 		}
-		l = interferences.get(b);
-		l.add(a);
-		interferences.put(b,l);
+		interferences.get(b).add(a);
+		
+//		if((a.equals("t0") && b.equals("t1")) ||(a.equals("t1") && b.equals("t0"))){
+//			System.out.println(interferences.get(a));
+//			System.out.println(interferences.get(b));
+//		}
 	}
 	
 	public void addMove(Temp a, Temp b){

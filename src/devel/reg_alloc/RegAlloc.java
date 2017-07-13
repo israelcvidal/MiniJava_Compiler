@@ -66,7 +66,7 @@ public class RegAlloc {
 				//System.out.println("Analysing node "+n1);
 				//we try to simplify
 				if(!preColNodes.contains(n1) && workingGraph.canSimplify(n1)){
-					System.out.println("Simplifying node "+n1);
+					//System.out.println("Simplifying node "+n1);
 					//remove it from the graph
 					workingGraph.removeNode(n1);
 					//put it on the simplifiedStack
@@ -146,16 +146,18 @@ public class RegAlloc {
 			//In case of merged nodes, analyse each temp
 			for(String t : temps.split(",")){
 				HashSet<Integer> neighColors = new HashSet<>();
-				
+				//System.out.println(colorMap.size()+" colored nodes");
 				//checking wich colors are beeing used
 				for(String n : graph.getInterferences(t)){
-					if(colorMap.containsKey(n))
-						neighColors.add(colorMap.get(t));
+					if(colorMap.containsKey(n)){
+						//System.out.println("Neighbor "+n+" already colored with color "+colorMap.get(n));
+						neighColors.add(colorMap.get(n));
+					}
 				}
 				//System.out.println("Temp "+t+" has neighbors colored "+neighColors+" and neighbors "+graph.getInterferences(t));
 				for(int i = 0; i<k;i++){
 					if(!neighColors.contains(i)){
-						System.out.println("Color choosed to "+t+" : "+i);
+						//System.out.println("Color choosed to "+t+" : "+i);
 						colorMap.put(t, i);
 						break;
 					}
@@ -168,10 +170,6 @@ public class RegAlloc {
 		for(String t : colorMap.keySet())
 			System.out.println(t+" - "+colorMap.get(t));
 		
-		//System.out.println(preColNodes);
-		
-//		System.out.println(graph.hasInterference("t3", "t37"));
-//		System.out.println(graph.getNodes().size());
 //		graph.save();
 		return colorMap;
 	}
