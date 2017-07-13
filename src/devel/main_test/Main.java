@@ -168,7 +168,7 @@ public class Main {
 //		   }
 		   
 		   // Allocate registers to temps
-		   HashMap<Temp, Integer> colors = RegAlloc.Alloc(ig);
+		   HashMap<String, Integer> colors = RegAlloc.Alloc(ig);
 		   
 	   	} catch (ParseException e) {
 	   		System.out.println(e.toString());
