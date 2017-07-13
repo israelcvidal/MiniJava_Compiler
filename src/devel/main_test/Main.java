@@ -3,12 +3,14 @@ package devel.main_test;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import core.abstract_syntax.syntaxtree.*;
 import core.activation_records.mips.MipsFrame;
+import core.activation_records.temp.Temp;
 import core.canonical_trees.BasicBlocks;
 import core.canonical_trees.Canon;
 import core.canonical_trees.TraceSchedule;
@@ -22,6 +24,7 @@ import devel.IR_translation.ProcFrag;
 import devel.IR_translation.TranslateVisitor;
 import devel.assemble_flow_graph.AssemFlowGraph;
 import devel.liveness_analysis.Liveness;
+import devel.reg_alloc.RegAlloc;
 import devel.semantic_analysis.BuildTableVisitor;
 import devel.semantic_analysis.CheckTableVisitor;
 import devel.semantic_analysis.ProgramTable;
@@ -159,11 +162,13 @@ public class Main {
 //		   }
 		  
 		   Liveness ig = new Liveness(afg);
-		   for(String node: ig.getNodes()){
-			   System.out.println(ig.getInterferences(node));
-		   }
+//		   printing interferences
+//		   for(String node: ig.getNodes()){
+//			   System.out.println(node + " - "+ ig.getInterferences(node));
+//		   }
 		   
 		   // Allocate registers to temps
+		   HashMap<Temp, Integer> colors = RegAlloc.Alloc(ig);
 		   
 	   	} catch (ParseException e) {
 	   		System.out.println(e.toString());
