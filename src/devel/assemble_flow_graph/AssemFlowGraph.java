@@ -54,8 +54,12 @@ public class AssemFlowGraph extends FlowGraph{
 					node_b = nodes.head;
 			}
 			
+//			Verify if node_a is a unconditionally branch or jump
+			char carac1 = node_a.getInstruction().assem.substring(0, 3).toCharArray()[1];
+			char carac2 = node_a.getInstruction().assem.substring(0, 3).toCharArray()[2];
+			
 //			Adding edge to next instruction in list
-			if(node_b != null)
+			if(!("b ".equals(carac1+""+carac2) || "j ".equals(carac1+""+carac2)) && node_b != null)
 				this.addEdge(node_a, node_b);
 			
 			node_b = null;
