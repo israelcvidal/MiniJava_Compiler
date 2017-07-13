@@ -32,7 +32,6 @@ public class Liveness extends InterferenceGraph {
 			liveIn.put(node, new HashSet<Temp>());
 			liveOut.put(node, new HashSet<Temp>());
 		}
-		
 		while(changed){
 			changed = false;
 			
@@ -85,13 +84,12 @@ public class Liveness extends InterferenceGraph {
 				changed = changed || in.size() > in_ || out.size() > out_;
 			}	
 		}
+//		Printing LiveIn 
 //		Enumeration<Node> keys = liveIn.keys();
 //		while(keys.hasMoreElements()){
 //			Node key = keys.nextElement();
 //			System.out.println(key + ":" + liveIn.get(key));
 //		}
-		
-		System.out.println(count);
 		
 		//Building interference graph
 		
