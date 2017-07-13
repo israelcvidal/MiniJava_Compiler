@@ -15,8 +15,8 @@ public class Liveness extends InterferenceGraph {
 	private java.util.Dictionary<Node, HashSet<Temp>> liveIn = new java.util.Hashtable<Node, HashSet<Temp>>();
 	private java.util.Dictionary<Node, HashSet<Temp>> liveOut = new java.util.Hashtable<Node, HashSet<Temp>>();
 	private FlowGraph flowGraph;
-	private HashMap<String,ArrayList<String>> interferences;
-	private HashMap<String,ArrayList<String>> moves;
+	private HashMap<String, HashSet<String>> interferences;
+	private HashMap<String, HashSet<String>> moves;
 	private int significativeDegree;
 	
 	public  Liveness(FlowGraph flowGraph) {
@@ -141,14 +141,14 @@ public class Liveness extends InterferenceGraph {
 	
 	public void addInterference(String a, String b){
 		if(!interferences.containsKey(a)){
-			interferences.put(a, new ArrayList<String>());
+			interferences.put(a, new HashSet<String>());
 		}
-		ArrayList<String> l = interferences.get(a);
+		HashSet<String> l = interferences.get(a);
 		l.add(b);
 		interferences.put(a,l);
 		
 		if(!interferences.containsKey(b)){
-			interferences.put(b, new ArrayList<String>());
+			interferences.put(b, new HashSet<String>());
 		}
 		l = interferences.get(b);
 		l.add(a);
@@ -161,26 +161,26 @@ public class Liveness extends InterferenceGraph {
 	
 	public void addMove(String a, String b){
 		if(!moves.containsKey(a)){
-			moves.put(a, new ArrayList<String>());
+			moves.put(a, new HashSet<String>());
 		}
-		ArrayList<String> l = moves.get(a);
+		HashSet<String> l = moves.get(a);
 		l.add(b);
 		moves.put(a,l);
 		
 		if(!moves.containsKey(b)){
-			moves.put(b, new ArrayList<String>());
+			moves.put(b, new HashSet<String>());
 		}
 		l = moves.get(b);
 		l.add(a);
 		moves.put(b,l);
 	}
 	
-	public ArrayList<String> getInterferences(String a){
-		return interferences.getOrDefault(a, new ArrayList<String>());
+	public HashSet<String> getInterferences(String a){
+		return interferences.getOrDefault(a, new HashSet<String>());
 	}
 	
-	public ArrayList<String> getMoves(String a){
-		return moves.getOrDefault(a, new ArrayList<String>());
+	public HashSet<String> getMoves(String a){
+		return moves.getOrDefault(a, new HashSet<String>());
 	}
 	
 	public int degreeOf(String a){
@@ -196,12 +196,11 @@ public class Liveness extends InterferenceGraph {
 	}
 	
 	public boolean George(String a, String b){
-		ArrayList<String> neighs = interferences.get(a);
+		HashSet<String> neighs = interferences.get(a);
 		int cont = 0;
 		
-		for(int i=0; i<neighs.size(); i++){
+		for(String n: neighs){
 			//the temp is neighbor of b
-			String n = neighs.get(i);
 			if(hasInterference(b, n))
 				cont++;
 			else
@@ -216,9 +215,8 @@ public class Liveness extends InterferenceGraph {
 		
 		neighs = interferences.get(b);
 		cont = 0;
-		for(int i=0; i<neighs.size(); i++){
+		for(String n: neighs){
 			//the edge is neighbor of b
-			String n = neighs.get(i);
 			if(hasInterference(a, n))
 				cont++;
 			else
