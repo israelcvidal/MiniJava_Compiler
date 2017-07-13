@@ -10,13 +10,15 @@ import devel.liveness_analysis.Liveness;
 public class RegAlloc {
 	public static HashMap<String,Integer> Alloc(Liveness graph){
 		int k = graph.getNumReg();
-		Liveness workingGraph = graph;
+		Liveness workingGraph = new Liveness(graph);
 		HashMap<String,Integer> colors = new HashMap<>();
+		HashMap<String,Boolean> freezedNodes = new HashMap<>();
+		
 		Stack<String> simplifyStack = new Stack<>();
 		Stack<String> spillStack = new Stack<>();
 		Stack<String> freezeStack = new Stack<>();
 		boolean change = true;
-		
+		System.out.println(workingGraph.getNodes().size()+" nodes to analyse");
 		//trying to make changes on the graph
 		while(change){
 			change = false;
@@ -26,7 +28,11 @@ public class RegAlloc {
 				//simplify
 				if(workingGraph.canSimplify(n1)){
 					workingGraph.removeNode(n1);
-					simplifyStack.add(n1);
+					if(freezedNodes.containsKey(n1))
+						freezeStack.add(n1);
+					else
+						simplifyStack.add(n1);
+					
 					change = true;
 				}
 				else{
@@ -35,23 +41,46 @@ public class RegAlloc {
 						if((workingGraph.Briggs(n1, n2) || workingGraph.George(n1, n2)) 
 								&& !workingGraph.hasInterference(n1, n2) && workingGraph.hasMove(n1, n2)){
 							workingGraph.merge(n1, n2);
+							System.out.println("Merged "+n1+" whith "+n2);
 							change = true;
 						}
-						else{
-							//freeze
-							if(workingGraph.canFreeze(n1)){
-								workingGraph.removeNode(n1);
-								freezeStack.add(n1);
-								change = true;
-							}
-							//spill
-							else{
-								System.out.println("adding potencial spill");
-								workingGraph.removeNode(n1);
-								spillStack.add(n1);
-								change = true;
+						
+					}
+				}
+				
+				//if we don't merge or simplify, we need to freeze or add as a potential spill
+				if(!change){
+					int min = Integer.MAX_VALUE;
+					String node = null;
+					for(String n : workingGraph.getNodes()){
+						int degree = workingGraph.degreeOf(n);
+						if(degree<min && workingGraph.hasMove(n)){
+							min = degree;
+							node = n;
+						}
+					}
+					//if there is a node to freeze
+					if(node!=null){
+						//remove all the moves from taht node
+						workingGraph.freeze(node);
+						freezedNodes.put(node, true);
+						change = true;
+					}
+					//spill
+					else{
+						int max = 0;
+						for(String n : workingGraph.getNodes()){
+							int degree = workingGraph.degreeOf(n);
+							if(degree>max){
+								max = degree;
+								node = n;
 							}
 						}
+						
+						System.out.println("adding potencial spill");
+						workingGraph.removeNode(node);
+						spillStack.add(node);
+						change = true;
 					}
 				}
 			}
@@ -61,7 +90,6 @@ public class RegAlloc {
 		System.out.println(simplifyStack.size()+" simplified nodes to color");
 		while(!simplifyStack.isEmpty()){
 			String temps = simplifyStack.pop();
-			System.out.println("Coloring "+temps);
 			//In case of merged nodes, analyse each temp
 			for(String t : temps.split(",")){
 				HashSet<Integer> neighColors = new HashSet<>();
@@ -74,6 +102,7 @@ public class RegAlloc {
 				
 				for(int i = 0; i<k;i++){
 					if(!neighColors.contains(i)){
+						System.out.println("Color choosed to "+t+" : "+i);
 						colors.put(t, i);
 						break;
 					}
@@ -146,8 +175,11 @@ public class RegAlloc {
 		//printing collors
 		System.out.println("Colors: "+colors.size());
 		
-//		for(String t : colors.keySet())
-//			System.out.println(t+" - "+colors.get(t));
+		for(String t : colors.keySet())
+			System.out.println(t+" - "+colors.get(t));
+		
+//		System.out.println(graph.hasInterference("t3", "t37"));
+//		System.out.println(graph.getNodes().size());
 		return colors;
 	}
 }

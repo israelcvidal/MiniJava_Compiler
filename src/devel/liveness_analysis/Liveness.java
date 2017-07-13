@@ -19,7 +19,7 @@ public class Liveness extends InterferenceGraph {
 	private FlowGraph flowGraph;
 	private HashMap<String, HashSet<String>> interferences;
 	private HashMap<String, HashSet<String>> moves;
-	private int significativeDegree = 18;
+	private int significativeDegree = 32;
 	
 	public  Liveness(FlowGraph flowGraph) {
 		this.flowGraph = flowGraph;
@@ -136,7 +136,40 @@ public class Liveness extends InterferenceGraph {
 			}
 		}
 	}
+	
+	public Liveness(Liveness graph){
+		this.liveIn = graph.getLiveIn();
+		this.liveOut = graph.getLiveOut();
+		this.flowGraph = graph.getFlowGraph();
+		this.interferences = (HashMap<String, HashSet<String>>)graph.getInterferences().clone();
+		this.moves = (HashMap<String, HashSet<String>>)graph.getMoves().clone();
+		this.significativeDegree = graph.getSignificativeDegree();
+	}
+	
+	public java.util.Dictionary<Node, HashSet<Temp>> getLiveIn() {
+		return liveIn;
+	}
 
+	public java.util.Dictionary<Node, HashSet<Temp>> getLiveOut() {
+		return liveOut;
+	}
+
+	public FlowGraph getFlowGraph() {
+		return flowGraph;
+	}
+
+	public HashMap<String, HashSet<String>> getInterferences() {
+		return interferences;
+	}
+
+	public HashMap<String, HashSet<String>> getMoves() {
+		return moves;
+	}
+
+	public int getSignificativeDegree() {
+		return significativeDegree;
+	}
+	
 	public void addInterference(Temp a, Temp b){
 		addInterference(a.toString(), b.toString());
 	}
@@ -202,6 +235,13 @@ public class Liveness extends InterferenceGraph {
 		if(!moves.containsKey(a))
 			return false;
 		return moves.get(a).contains(b);
+	}
+	
+	public boolean hasMove(String a){
+		if(!moves.containsKey(a))
+			return false;
+		
+		return moves.get(a).size()>0;
 	}
 	
 	public boolean George(String a, String b){
@@ -373,6 +413,13 @@ public class Liveness extends InterferenceGraph {
 	public MoveList moves() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void freeze(String a) {
+		HashSet<String> neighs = moves.remove(a);
+		for(String n : neighs){
+			moves.get(n).remove(a);
+		}
 	}
 
 }
