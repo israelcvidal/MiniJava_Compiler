@@ -1,9 +1,14 @@
 package devel.liveness_analysis;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 
 import core.activation_records.temp.Temp;
 import core.activation_records.temp.TempList;
@@ -421,5 +426,27 @@ public class Liveness extends InterferenceGraph {
 			moves.get(n).remove(a);
 		}
 	}
-
+	
+	public void save(){
+		try {
+			Writer w = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream("interferenceGraph.csv")));
+			
+			HashMap<String,HashSet<String>> edges = new HashMap<>();
+			
+			for(Map.Entry<String, HashSet<String>> entry : interferences.entrySet()){
+				String n1 = entry.getKey();
+				
+				for(String n2 : entry.getValue()){
+					w.write(n1+","+n2+"\n");
+				}
+			}
+			w.close();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 }

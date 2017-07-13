@@ -18,6 +18,7 @@ public class RegAlloc {
 		Stack<String> spillStack = new Stack<>();
 		Stack<String> freezeStack = new Stack<>();
 		boolean change = true;
+		graph.save();
 		System.out.println(workingGraph.getNodes().size()+" nodes to analyse");
 		//trying to make changes on the graph
 		while(change){
@@ -99,7 +100,7 @@ public class RegAlloc {
 					if(colors.containsKey(n))
 						neighColors.add(colors.get(t));
 				}
-				
+				System.out.println("Temp "+t+" has "+neighColors.size()+" neighbors colored and "+graph.getInterferences(t).size()+" neighbors");
 				for(int i = 0; i<k;i++){
 					if(!neighColors.contains(i)){
 						System.out.println("Color choosed to "+t+" : "+i);
@@ -124,7 +125,7 @@ public class RegAlloc {
 					if(colors.containsKey(n))
 						neighColors.add(colors.get(t));
 				}
-				
+				System.out.println("Temp "+t+" has "+neighColors.size()+" neighbors coloredand "+graph.getInterferences(t).size()+" neighbors");
 				if(neighColors.size()==k){
 					//TODO SPILL
 					System.out.println("Spill on freeze"); 
@@ -155,13 +156,14 @@ public class RegAlloc {
 					if(colors.containsKey(n))
 						neighColors.add(colors.get(t));
 				}
-				
+				System.out.println("Temp "+t+" has "+neighColors.size()+" neighbors colored and "+graph.getInterferences(t).size()+" neighbors");
 				if(neighColors.size()==k){
 					//TODO SPILL
 					System.out.println("Spill on spill stack"); 
 				}
 				
 				else{
+					//find the smaller color that is free
 					for(int i = 0; i<k;i++){
 						if(!neighColors.contains(i)){
 							colors.put(t, i);
@@ -180,6 +182,7 @@ public class RegAlloc {
 		
 //		System.out.println(graph.hasInterference("t3", "t37"));
 //		System.out.println(graph.getNodes().size());
+//		graph.save();
 		return colors;
 	}
 }
