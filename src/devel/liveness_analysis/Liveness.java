@@ -1,11 +1,8 @@
 package devel.liveness_analysis;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-
 import core.activation_records.temp.Temp;
 import core.activation_records.temp.TempList;
 import core.dataflow_analysis.flow_graph.FlowGraph;
@@ -15,8 +12,8 @@ import core.dataflow_analysis.reg_alloc.InterferenceGraph;
 import core.dataflow_analysis.reg_alloc.MoveList;
 
 public class Liveness extends InterferenceGraph {
-	private java.util.Dictionary<Node, ArrayList<Temp>> liveIn = new java.util.Hashtable<Node, ArrayList<Temp>>();
-	private java.util.Dictionary<Node, ArrayList<Temp>> liveOut = new java.util.Hashtable<Node, ArrayList<Temp>>();
+	private java.util.Dictionary<Node, HashSet<Temp>> liveIn = new java.util.Hashtable<Node, HashSet<Temp>>();
+	private java.util.Dictionary<Node, HashSet<Temp>> liveOut = new java.util.Hashtable<Node, HashSet<Temp>>();
 	private FlowGraph flowGraph;
 	private HashMap<String,ArrayList<String>> interferences;
 	private HashMap<String,ArrayList<String>> moves;
@@ -32,28 +29,25 @@ public class Liveness extends InterferenceGraph {
 		
 		for(NodeList nodes = this.flowGraph.nodes(); nodes!=null; nodes=nodes.tail){
 			Node node = nodes.head;
-			liveIn.put(node, new ArrayList<Temp>());
-			liveOut.put(node, new ArrayList<Temp>());
+			liveIn.put(node, new HashSet<Temp>());
+			liveOut.put(node, new HashSet<Temp>());
 		}
-		int count = 0;
+		
 		while(changed){
-			count++;
 			changed = false;
 			
 			for(NodeList nodes = this.flowGraph.nodes(); nodes!=null; nodes=nodes.tail){
 				Node node = nodes.head;
-				ArrayList<Temp> in = liveIn.get(node);
-				ArrayList<Temp> out = liveOut.get(node);
+				HashSet<Temp> in = liveIn.get(node);
+				HashSet<Temp> out = liveOut.get(node);
 				
 //				in'= in and out'= out
-				ArrayList<Temp> in_ = new ArrayList<Temp>();
-				ArrayList<Temp> out_ = new ArrayList<Temp>();
-				in_.addAll(in);
-				out_.addAll(out);
+				int in_ = in.size();
+				int out_ = out.size();
 				
-				ArrayList<Temp> uses = new ArrayList<Temp>();
-				ArrayList<Temp> defs = new ArrayList<Temp>();
-				ArrayList<Temp> outMinusDef = new ArrayList<Temp>();
+				HashSet<Temp> uses = new HashSet<Temp>();
+				HashSet<Temp> defs = new HashSet<Temp>();
+				HashSet<Temp> outMinusDef = new HashSet<Temp>();
 				
 //				getting uses from node
 				for(TempList temps = node.getUses(); temps!=null; temps = temps.tail){
@@ -66,7 +60,7 @@ public class Liveness extends InterferenceGraph {
 				}
 				
 //				getting union of In from all successors from node
-				ArrayList<Temp> inSucc = new ArrayList<Temp>();
+				HashSet<Temp> inSucc = new HashSet<Temp>();
 				for(NodeList succs = node.succ(); succs!=null; succs=succs.tail){
 					Node succ = succs.head;
 					inSucc.addAll(liveIn.get(succ));
@@ -77,19 +71,18 @@ public class Liveness extends InterferenceGraph {
 				in.addAll(uses);
 				
 //				creating set out-def
-				outMinusDef = out;
-				for (Temp temp : defs) {
-					outMinusDef.remove(temp);
+				for(Temp temp: out){
+					if(!defs.contains(temp))
+						outMinusDef.add(temp);
 				}
+				
 //				adding out-def to in
 				in.addAll(outMinusDef);
 				
 				liveIn.put(node, in);
 				liveOut.put(node, out);
 				
-				changed = changed || in.size() > in_.size() || out.size() > out_.size();
-
-				
+				changed = changed || in.size() > in_ || out.size() > out_;
 			}	
 		}
 //		Enumeration<Node> keys = liveIn.keys();
