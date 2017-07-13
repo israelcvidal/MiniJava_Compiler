@@ -2,42 +2,53 @@ package devel.reg_alloc;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 
+import core.activation_records.mips.MipsFrame;
 import core.activation_records.temp.Temp;
+import core.dataflow_analysis.graph.NodeList;
 import devel.liveness_analysis.Liveness;
 
 public class RegAlloc {
 	public static HashMap<String,Integer> Alloc(Liveness graph){
 		int k = graph.getNumReg();
 		Liveness workingGraph = new Liveness(graph);
-		HashMap<String,Integer> colors = new HashMap<>();
+		List<String> preColNodes = new LinkedList<String>();
+		HashMap<String,Integer> colorMap = new HashMap<>();
 		HashMap<String,Boolean> freezedNodes = new HashMap<>();
-		
+
 		Stack<String> simplifyStack = new Stack<>();
 		Stack<String> spillStack = new Stack<>();
 		Stack<String> freezeStack = new Stack<>();
+		
+		
+		for (int i = 0; i < MipsFrame.registers().length; i++) {
+			colorMap.put(MipsFrame.registers()[i].toString(), i++);
+			preColNodes.add(MipsFrame.registers()[i].toString());
+		}
+		
 		boolean change = true;
-		graph.save();
+		
+//		graph.save();
 		System.out.println(workingGraph.getNodes().size()+" nodes to analyse");
+		
 		//trying to make changes on the graph
-		while(change){
+		while(change) {
 			change = false;
 			//System.out.println("NEW ITERATION ------------------------------");
 			for(String n1 : workingGraph.getNodes()){
 				//System.out.println("Analizing node "+n1);
 				//simplify
-				if(workingGraph.canSimplify(n1)){
+
+				if(!preColNodes.contains(n1) && workingGraph.canSimplify(n1)){
 					workingGraph.removeNode(n1);
-					if(freezedNodes.containsKey(n1))
-						freezeStack.add(n1);
-					else
-						simplifyStack.add(n1);
-					
+					simplifyStack.push(n1);
 					change = true;
-				}
-				else{
-					for(String n2 : workingGraph.getMoves(n1)){
+					
+				} else {
+					for(String n2 : workingGraph.getMoves(n1)) {
 						//merging
 						if((workingGraph.Briggs(n1, n2) || workingGraph.George(n1, n2)) 
 								&& !workingGraph.hasInterference(n1, n2) && workingGraph.hasMove(n1, n2)){
@@ -64,7 +75,7 @@ public class RegAlloc {
 					if(node!=null){
 						//remove all the moves from taht node
 						workingGraph.freeze(node);
-						freezedNodes.put(node, true);
+//						freezedNodes.put(node, true);
 						change = true;
 					}
 					//spill
@@ -72,15 +83,16 @@ public class RegAlloc {
 						int max = 0;
 						for(String n : workingGraph.getNodes()){
 							int degree = workingGraph.degreeOf(n);
-							if(degree>max){
+							if(!preColNodes.contains(n1) && degree>max) {
 								max = degree;
 								node = n;
 							}
 						}
-						
-						System.out.println("adding potencial spill");
+						if (workingGraph.getNodes().size() != 0)
+						System.out.println("adding potencial spill" + workingGraph.getNodes().size());
 						workingGraph.removeNode(node);
-						spillStack.add(node);
+						simplifyStack.push(node);
+						spillStack.push(node);
 						change = true;
 					}
 				}
@@ -97,14 +109,14 @@ public class RegAlloc {
 				
 				//checking wich colors are beeing used
 				for(String n : graph.getInterferences(t)){
-					if(colors.containsKey(n))
-						neighColors.add(colors.get(t));
+					if(colorMap.containsKey(n))
+						neighColors.add(colorMap.get(t));
 				}
 				System.out.println("Temp "+t+" has "+neighColors.size()+" neighbors colored and "+graph.getInterferences(t).size()+" neighbors");
 				for(int i = 0; i<k;i++){
 					if(!neighColors.contains(i)){
 						System.out.println("Color choosed to "+t+" : "+i);
-						colors.put(t, i);
+						colorMap.put(t, i);
 						break;
 					}
 				}
@@ -122,8 +134,8 @@ public class RegAlloc {
 				
 				//checking wich colors are beeing used
 				for(String n : graph.getInterferences(t)){
-					if(colors.containsKey(n))
-						neighColors.add(colors.get(t));
+					if(colorMap.containsKey(n))
+						neighColors.add(colorMap.get(t));
 				}
 				System.out.println("Temp "+t+" has "+neighColors.size()+" neighbors coloredand "+graph.getInterferences(t).size()+" neighbors");
 				if(neighColors.size()==k){
@@ -134,7 +146,7 @@ public class RegAlloc {
 				else{
 					for(int i = 0; i<k;i++){
 						if(!neighColors.contains(i)){
-							colors.put(t, i);
+							colorMap.put(t, i);
 							break;
 						}
 					}
@@ -153,8 +165,8 @@ public class RegAlloc {
 				
 				//checking wich colors are beeing used
 				for(String n : graph.getInterferences(t)){
-					if(colors.containsKey(n))
-						neighColors.add(colors.get(t));
+					if(colorMap.containsKey(n))
+						neighColors.add(colorMap.get(t));
 				}
 				System.out.println("Temp "+t+" has "+neighColors.size()+" neighbors colored and "+graph.getInterferences(t).size()+" neighbors");
 				if(neighColors.size()==k){
@@ -166,7 +178,7 @@ public class RegAlloc {
 					//find the smaller color that is free
 					for(int i = 0; i<k;i++){
 						if(!neighColors.contains(i)){
-							colors.put(t, i);
+							colorMap.put(t, i);
 							break;
 						}
 					}
@@ -175,14 +187,14 @@ public class RegAlloc {
 		}
 		
 		//printing collors
-		System.out.println("Colors: "+colors.size());
+		System.out.println("Colors: "+colorMap.size());
 		
-		for(String t : colors.keySet())
-			System.out.println(t+" - "+colors.get(t));
+		for(String t : colorMap.keySet())
+			System.out.println(t+" - "+colorMap.get(t));
 		
 //		System.out.println(graph.hasInterference("t3", "t37"));
 //		System.out.println(graph.getNodes().size());
 //		graph.save();
-		return colors;
+		return colorMap;
 	}
 }

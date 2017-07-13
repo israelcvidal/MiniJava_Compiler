@@ -168,12 +168,12 @@ public class Main {
 		   Liveness ig = new Liveness(afg);
 		   
 //		   printing interferences
-		   for(String node: ig.getNodes()){
-			   System.out.println(node + " - "+ ig.getInterferences(node));
-		   }
+//		   for(String node: ig.getNodes()){
+//			   System.out.println(node + " - "+ ig.getInterferences(node));
+//		   }
 		   
 		   // Allocate registers to temps
-//		   HashMap<String, Integer> colors = RegAlloc.Alloc(ig);
+		   HashMap<String, Integer> colors = RegAlloc.Alloc(ig);
 		   
 	   	} catch (ParseException e) {
 	   		System.out.println(e.toString());

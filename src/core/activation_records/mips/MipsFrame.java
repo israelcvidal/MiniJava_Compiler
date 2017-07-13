@@ -383,7 +383,7 @@ public class MipsFrame extends Frame {
 	addAll(l, specialRegs);
 	registers = l.toArray(registers);
     }
-    public Temp[] registers() {
+    public static Temp[] registers() {
 	return registers;
     }
 
