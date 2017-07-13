@@ -332,7 +332,7 @@ public class Liveness extends InterferenceGraph {
 	}
 	
 	public boolean canSimplify(String a){
-		return degreeOf(a)<significativeDegree && (!moves.containsKey(a) || moves.get(a).size()==0);
+		return degreeOf(a)<significativeDegree && (moves.getOrDefault(a, new HashSet<>()).size()==0);
 	}
 	
 	public boolean canFreeze(String a){
@@ -391,6 +391,8 @@ public class Liveness extends InterferenceGraph {
 	}
 	
 	public void removeNode(String a){
+//		System.out.println("Trying to remove node "+a);
+//		System.out.println(interferences.containsKey(a));
 		interferences.remove(a);
 		for(String k : interferences.keySet())
 			interferences.get(k).remove(a);
