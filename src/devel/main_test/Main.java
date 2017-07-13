@@ -47,14 +47,18 @@ public class Main {
 	public final static String TEST_LINKED_LIST = TEST_FOLDER + "LinkedList.java";
 	public final static String TEST_QUICK_SORT = TEST_FOLDER + "QuickSort.java";
 	public final static String TEST_TREE_VISITOR = TEST_FOLDER + "TreeVisitor.java";
+	public final static String TEST_TRIVIAL = TEST_FOLDER + "Trivial.java";
+
 //													0					1				2					3
 	public final static String[] caseTests = {TEST_BINARY_SEARCH, TEST_BINARY_TREE, TEST_BUBBLE_SORT, TEST_FACTORIAL,
-											  TEST_LINEAR_SEARCH, TEST_LINKED_LIST, TEST_QUICK_SORT, TEST_TREE_VISITOR};
+											  TEST_LINEAR_SEARCH, TEST_LINKED_LIST, TEST_QUICK_SORT, TEST_TREE_VISITOR,
 //													4					5				6					7
+											  TEST_TRIVIAL};
+//													8
 	public static void main(String [] args) {
 	   try {
 		   //Read a file with the program
-		   BufferedReader br = new BufferedReader(new FileReader(caseTests[3]));
+		   BufferedReader br = new BufferedReader(new FileReader(caseTests[8]));
 		   
 		   // Analysis lexical and parsing
 		   @SuppressWarnings("static-access")
@@ -142,13 +146,13 @@ public class Main {
 		   
 		   
 		   //Print all of instructions' program
-		   InstrList printInst = allInstr;
-		   
+//		   InstrList printInst = allInstr;
+//		   
 //		   while (printInst != null) {
 //			   System.out.println(printInst.head.assem);
 //			   printInst = printInst.tail;
 //		   }
-//		   
+		   
 		   // Generate FlowGraph and InterferenceGraph
 		   AssemFlowGraph afg = new AssemFlowGraph(allInstr);
 		   
@@ -162,13 +166,14 @@ public class Main {
 //		   }
 		  
 		   Liveness ig = new Liveness(afg);
+		   
 //		   printing interferences
-//		   for(String node: ig.getNodes()){
-//			   System.out.println(node + " - "+ ig.getInterferences(node));
-//		   }
+		   for(String node: ig.getNodes()){
+			   System.out.println(node + " - "+ ig.getInterferences(node));
+		   }
 		   
 		   // Allocate registers to temps
-		   HashMap<String, Integer> colors = RegAlloc.Alloc(ig);
+//		   HashMap<String, Integer> colors = RegAlloc.Alloc(ig);
 		   
 	   	} catch (ParseException e) {
 	   		System.out.println(e.toString());
