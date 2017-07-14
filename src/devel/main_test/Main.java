@@ -58,7 +58,7 @@ public class Main {
 	public static void main(String [] args) {
 	   try {
 		   //Read a file with the program
-		   BufferedReader br = new BufferedReader(new FileReader(caseTests[8]));
+		   BufferedReader br = new BufferedReader(new FileReader(caseTests[7]));
 		   
 		   // Analysis lexical and parsing
 		   @SuppressWarnings("static-access")
@@ -173,6 +173,7 @@ public class Main {
 //		   }
 		   
 		   // Allocate registers to temps
+		   RegAlloc.instList = allInstr;
 		   HashMap<String, Integer> colors = RegAlloc.Alloc(ig);
 		   
 	   	} catch (ParseException e) {

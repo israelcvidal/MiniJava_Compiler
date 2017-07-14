@@ -1,5 +1,6 @@
 package devel.reg_alloc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -7,9 +8,16 @@ import java.util.List;
 import java.util.Stack;
 
 import core.activation_records.mips.MipsFrame;
+import core.activation_records.temp.Temp;
+import core.activation_records.temp.TempList;
+import core.instruction_selection.assem.Instr;
+import core.instruction_selection.assem.InstrList;
+import core.instruction_selection.assem.MOVE_ASSEM;
+import devel.assemble_flow_graph.AssemFlowGraph;
 import devel.liveness_analysis.Liveness;
 
 public class RegAlloc {
+	public static InstrList instList;
 	public static HashMap<String,Integer> Alloc(Liveness graph){
 		int k = graph.getNumReg();
 		Liveness workingGraph = new Liveness(graph);
@@ -19,10 +27,9 @@ public class RegAlloc {
 		
 		//stack of simplified nodes (without freeze)
 		Stack<String> simplifyStack = new Stack<>();
-		//stack of potential spill nodes
-//		Stack<String> spillStack = new Stack<>();
-//		//stack of simplified nodes (with freeze)
-//		Stack<String> freezeStack = new Stack<>();
+
+		//set of real spill temps
+		HashSet<String> spillStack = new HashSet<>();
 		
 		//pre-colorred nodes
 		for (int i = 0; i < MipsFrame.registers().length; i++) {
@@ -74,9 +81,6 @@ public class RegAlloc {
 					change = true;
 					
 				} else {
-					if(!preColNodes.contains(n1))
-//						System.out.println("Can't simplify node "+n1+". It has degree "+workingGraph.degreeOf(n1)+
-//								" (max = "+workingGraph.getNumReg()+") and "+workingGraph.getMoves(n1).size()+" moves");
 					//we try too merge with one of it's neighbors
 					for(String n2 : workingGraph.getMoves(n1)) {
 						//check briggs and george
@@ -154,6 +158,14 @@ public class RegAlloc {
 						neighColors.add(colorMap.get(n));
 					}
 				}
+				
+				//spill!
+				if(neighColors.size()==k){
+					System.out.println("Real spill occured");
+					//we add the spill to the stack as a temp
+					spillStack.add(t);
+				}
+				
 				//System.out.println("Temp "+t+" has neighbors colored "+neighColors+" and neighbors "+graph.getInterferences(t));
 				for(int i = 0; i<k;i++){
 					if(!neighColors.contains(i)){
@@ -164,13 +176,73 @@ public class RegAlloc {
 				}
 			}
 		}
-				
-		//printing collors
-		System.out.println("Colored temps: ("+colorMap.size()+")");
-		for(String t : colorMap.keySet())
-			System.out.println(t+" - "+colorMap.get(t));
 		
-//		graph.save();
+		if(spillStack.isEmpty()){
+				
+			//printing collors
+			System.out.println("Colored temps: ("+colorMap.size()+")");
+			for(String t : colorMap.keySet())
+				System.out.println(t+" - "+colorMap.get(t));			
+		}
+		else{
+			colorMap = rewriteCode(spillStack);
+		}
 		return colorMap;
+	}
+	
+	public static HashMap<String,Integer> rewriteCode(HashSet<String> spills){
+		Instr instr = instList.head;
+		ArrayList<Instr> newList = new ArrayList<>();
+		
+		HashMap<String,Integer> newTemps = new HashMap<>();
+		
+		while(instr!=null){
+			TempList use = instr.use();
+			while(use!=null){
+				//if use a spilled node, we should add a memory load to a new temp
+				if(spills.contains(use.head.toString())){
+					//add a load instruction on the newList
+					Temp aux = new Temp();
+					Instr newInstr = new MOVE_ASSEM("sw "+aux+", 0('"+use.head+")",aux, use.head);
+					newList.add(newInstr);
+					
+					//we must replace the old used temp for the new one created
+					instr.use().replace(use.head, aux);
+				}
+				
+				use = use.tail;
+			}
+			//after check all the used temps, getting from memory and replacing the spill ones,
+			//we add the instruction to the list;
+			newList.add(instr);
+			
+			TempList def = instr.def();
+			while(def!=null){
+				//if use a spilled node, we should add a memory load to a new temp
+				if(spills.contains(def.head.toString())){
+					//we just create a new temp to get a memory position
+					Temp aux = new Temp();
+					//add a save instruction on the newList
+					Instr newInstr = new MOVE_ASSEM("lw "+aux+", 0('"+def.head+")",aux, def.head);
+					newList.add(newInstr);
+				}
+				
+				def = def.tail;
+			}
+			//after check all the defined temps, getting from memory and replacing the spill ones,
+			//we add the instruction to the list;
+			newList.add(instr);
+		}
+		
+		InstrList newInstList = null;
+		
+		//now we re-build the instructions list on the head/tail format
+		for(int i=newList.size()-1; i<=0; i--){
+			newInstList = new InstrList(newList.get(i), newInstList);
+		}
+		
+		return RegAlloc.Alloc(new Liveness(
+				new AssemFlowGraph(
+						newInstList)));
 	}
 }
