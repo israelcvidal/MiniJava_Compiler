@@ -1,4 +1,4 @@
-# INÍCIO RELATÓRIO FINAL #
+# ---- INÍCIO RELATÓRIO FINAL ---- #
 
 # RESUMO: #
 No compilador construído, todas as fases propostas ao longo da disciplina foram implementadas com sucesso, isto é, utilizando os oito exemplos disponibilizados na página do livro texto para testar o código desenvolvido, em todos eles o compilador implementado funcionou. Além disso, criamos um novo teste para complementar os testes disponibilizados. Com isso, em todas as fases foram realizados 9 testes e, no final, todas as fases funcionaram em todos os testes. A classe Main do pacote devel.main_test centraliza os testes disponíveis e a chamada para cada uma das fases implementadas.
@@ -133,7 +133,7 @@ No compilador construído, todas as fases propostas ao longo da disciplina foram
 # Dificuldades e aprendizado: #
 	A maior dificuldade foi o tratamento do transbordamento real. Reescrever o código não era algo tão simples de se implementar, mas depois de analisar toda a teoria e as dicas do livro, conseguimos fazê-lo e de uma maneira não tão custosa. Outra dificuldade foi implementar o pipeline de execução das operações sobre o grafo de interferência (simplificação, aglutinação, freeze e transbordamento em potencial). Uma vez montado, pensamos nas heurísticas descritas para seleção de nó para aplicar freeze e para transbordar, de maneira que a chance de haver uma simplificação na etapa seguinte fosse maior.
 
-# FIM RELATÓRIO FINAL #
+# ---- FIM RELATÓRIO FINAL ---- #
 
 # README #
 
