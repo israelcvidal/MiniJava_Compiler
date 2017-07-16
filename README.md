@@ -1,4 +1,4 @@
-# 			INÍCIO RELATÓRIO FINAL 			#
+# ======> RELATÓRIO FINAL <====== #
 
 # RESUMO: #
 	No compilador construído, todas as fases propostas ao longo da disciplina foram implementadas com sucesso, isto é, utilizando 
@@ -7,7 +7,9 @@
 	fases foram realizados 9 testes e, no final, todas as fases funcionaram em todos os testes. A classe Main do pacote 
 	devel.main_test centraliza os testes disponíveis e a chamada para cada uma das fases implementadas.
 
+# #
 # FASES DETALHADAS: #
+# #
 
 # • • • ORGANIZAÇÃO DO FRAMEWORK • • • #
 
@@ -25,7 +27,6 @@
 	A organização do nome das classes apresentava um erro em sistemas  operacionais que não eram sensíveis à capitalização, 
 	logo tivemos de realizar algumas leves mudanças no nome das classes.
 
-
 # • • • ANÁLISE LÉXICA • • • #
 
 # O que foi feito: #
@@ -37,7 +38,6 @@
 
 # Dificuldades e aprendizado: #
 	Entender o funcionamento e a sintaxe do javaCC.
-
 
 # • • • ANÁLISE SINTÁTICA • • • #
 
@@ -78,7 +78,6 @@
 	e posteriormente utilizar essas tabelas no outro visitor para realizar a verificação. No final, preferimos utilizar 
 	o caminho da recursão que facilitou o nosso entendimento.
 
-
 # • • • TRADUÇÃO PARA IR • • • #
 
 # O que foi feito: #
@@ -102,7 +101,6 @@
 	pacote java.util. Assim, um esforço foi necessário para acoplar o MipsFrame com sucesso no nosso projeto. Ademais,
 	outras dificuldades também nos fizeram aprender, por exemplo traduzir comandos de alto nível em comandos de 
 	médio/baixo nível.
-
 
 # • • • GERAÇÃO DA IR CANÔNICA • • • #
 
@@ -129,7 +127,6 @@
 # Dificuldades e aprendizado: #
 	Novamente, nenhuma dificuldade desde que o necessário para esta fase já estava implementado no framework.
 
-
 # • • • SELEÇÃO DE INSTRUÇÕES/LADRILHAMENTO • • • #
 
 # O que foi feito: #
@@ -148,7 +145,6 @@
 	registradores, moves, etc. Ademais, o primeiro contato com a arquitetura Mips também foi bastante dificultosa, pois esta
 	arquitetura é bastante ampla e possui variadas versões. Todavia, o MipsFrame nos ajudou a entender algumas partes, como 
 	exemplo quais registradores existem no Mips, etc.
-
 
 # • • • GERAÇÃO DO GRAFO DE FLUXO DE CONTROLE • • • #
 
@@ -175,7 +171,10 @@
 
 # Como foi feito: #
 	Nesta etapa optamos por uma abordagem alternativa à proposta pelo livro. Ao invés de utilizarmos a estrutura pré-definida
-	do grafo, optamos por construir nossa própria abstração pois, dessa forma, achamos mais fácil de implementar o que era proposto. Primeiramente, utilizamos o algoritmo proposto pelo livro para calcular os LiveIn e LiveOut de cada nó do grafo, em seguida, adicionamos uma interferência entre um par de nós  a,b sempre que a,b ocorrerem juntos em uma mesma aresta de LiveIn ou de LiveOut.
+	do grafo, optamos por construir nossa própria abstração pois, dessa forma, achamos mais fácil de implementar o que era
+	proposto. Primeiramente, utilizamos o algoritmo proposto pelo livro para calcular os LiveIn e LiveOut de cada nó do grafo,
+	em seguida, adicionamos uma interferência entre um par de nós  a,b sempre que a,b ocorrerem juntos em uma mesma aresta 
+	de LiveIn ou de LiveOut.
 
 # Dificuldades e aprendizado: #
 	Quanto a representação do grafo tivemos dificuldade em como representar os nós de maneira compatível com aglutinação,
@@ -184,7 +183,6 @@
 	persistência das interferências e dos moves no grafo após cada inserção e remoção de nós pois, uma vez que o grafo não
 	é direcionado, tivemos de guardar cada aresta 2 vezes, uma em cada sentido. Não foi difícil de ser resolvido, apenas 
 	um detalhe laborioso.
-
 
 # • • • SELEÇÃO DE REGISTRADORES/COLORAÇÃO • • • #
 
@@ -199,7 +197,10 @@
 	registradores (em casos de aglutinação, nós que contenham registradores). Primeiramente, para cada nó, tentamos simplificá-lo.
 	Caso não seja possível, tentamos aglutiná-lo. Não havendo nenhuma dessas operações ocorrido, obteremos o nó move-related de
 	menor grau para aplicar freeze. Em último caso, quando não há um nó move-related, removemos como um transbordamento em
-	potencial o nó de maior grau. Uma vez terminada essa análise, desempilhamos os nós e escolhemos a menor cor disponível para ele. Em caso de transbordamento real, armazenamos os nós transbordantes em uma pilha e, no final, reescrevemos a lista de instruções adicionando instruções de SAVE e LOAD da memória antes das definições e usos e, em seguida, refazemos toda a etapa da seleção de registradores.
+	potencial o nó de maior grau. Uma vez terminada essa análise, desempilhamos os nós e escolhemos a menor cor disponível para 
+	ele. Em caso de transbordamento real, armazenamos os nós transbordantes em uma pilha e, no final, reescrevemos a lista de
+	instruções adicionando instruções de SAVE e LOAD da memória antes das definições e usos e, em seguida, refazemos toda a
+	etapa da seleção de registradores.
 
 # Dificuldades e aprendizado: #
 	A maior dificuldade foi o tratamento do transbordamento real. Reescrever o código não era algo tão simples de se implementar,
