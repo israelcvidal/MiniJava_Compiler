@@ -36,26 +36,33 @@ public abstract class FlowGraph extends Graph {
   * Print a human-readable dump for debugging.
   */
      public void show(java.io.PrintStream out) {
-	for (NodeList p=nodes(); p!=null; p=p.tail) {
-	  Node n = p.head;
-	  out.print(n.toString());
-	  out.print(": ");
-	  for(TempList q=def(n); q!=null; q=q.tail) {
-	     out.print(q.head.toString());
-	     out.print(" ");
-	  }
-	  out.print(isMove(n) ? "<= " : "<- ");
-	  for(TempList q=use(n); q!=null; q=q.tail) {
-	     out.print(q.head.toString());
-	     out.print(" ");
-	  }
-	  out.print("; goto ");
-	  for(NodeList q=n.succ(); q!=null; q=q.tail) {
-	     out.print(q.head.toString());
-	     out.print(" ");
-	  }
-	  out.println();
-	}
+    	 
+		for (NodeList p=nodes(); p!=null; p=p.tail) {
+		  Node n = p.head;
+		  out.print(n.toString());
+		  out.print(": ");
+		  
+		  for(TempList q=def(n); q!=null; q=q.tail) {
+		     out.print(q.head.toString());
+		     out.print(" ");
+		  }
+		  
+		  out.print(isMove(n) ? "<= " : "<- ");
+		  
+		  for(TempList q=use(n); q!=null; q=q.tail) {
+		     out.print(q.head.toString());
+		     out.print(" ");
+		  }
+		  
+		  out.print("; goto ");
+		  
+		  for(NodeList q=n.succ(); q!=null; q=q.tail) {
+		     out.print(q.head.toString());
+		     out.print(" ");
+		  }
+		  
+		  out.println();
+		}
      }
 
 }

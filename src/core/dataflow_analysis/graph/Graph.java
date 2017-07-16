@@ -1,13 +1,15 @@
 package core.dataflow_analysis.graph;
 
+import core.instruction_selection.assem.Instr;
+
 public class Graph {
 
   int nodecount=0;
   NodeList mynodes, mylast;
   public NodeList nodes() { return mynodes;} 
 
-  public Node newNode() {
-	return new Node(this);
+  public Node newNode(Instr instruction) {
+	return new Node(this, instruction);
   }
 
   void check(Node n) {
@@ -42,7 +44,7 @@ public class Graph {
  /**
   * Print a human-readable dump for debugging.
   */
-     public void show(java.io.PrintStream out) {
+  public void show(java.io.PrintStream out) {
 	for (NodeList p=nodes(); p!=null; p=p.tail) {
 	  Node n = p.head;
 	  out.print(n.toString());

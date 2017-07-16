@@ -1,5 +1,6 @@
 package core.translation_to_IR.tree;
 
+
 public class MOVE extends Stm {
   public AbstractExp dst, src;
   public MOVE(AbstractExp d, AbstractExp s) {dst=d; src=s;}
@@ -13,5 +14,7 @@ public class MOVE extends Stm {
 	   return new MOVE(new MEM(kids.head), kids.tail.head);
 	else return new MOVE(dst, kids.head);
   }
+  
+  
 }
 

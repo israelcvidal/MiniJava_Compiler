@@ -7,5 +7,6 @@ public class MEM extends AbstractExp {
   public AbstractExp build(ExpList kids) {
     return new MEM(kids.head);
   }
+  
 }
 

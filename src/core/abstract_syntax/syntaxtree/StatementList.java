@@ -1,5 +1,6 @@
 package core.abstract_syntax.syntaxtree;
 
+import java.util.Enumeration;
 import java.util.Vector;
 
 public class StatementList {
@@ -29,4 +30,9 @@ public class StatementList {
 	   for(int i=0; i<list.size();i++)
 		   list.add(ns.elementAt(i));
    }
+   
+   public Enumeration<Statement> getEnumeration() {
+	   return list.elements();
+   }
+   
 }

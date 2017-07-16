@@ -10,6 +10,8 @@ public abstract class Instr {
   public String assem;
   public abstract TempList use();
   public abstract TempList def();
+  public abstract void replaceUse(Temp s, Temp t);
+  public abstract void replaceDef(Temp s, Temp t);
   public abstract Targets jumps();
 
   private Temp nthTemp(TempList l, int i) {

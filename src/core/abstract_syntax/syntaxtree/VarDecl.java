@@ -1,7 +1,8 @@
 package core.abstract_syntax.syntaxtree;
 
 import core.abstract_syntax.visitor.Visitor;
-import devel.semantic_analysis.TypeTable;
+import core.translation_to_IR.tree.Stm;
+import devel.IR_translation.IRVisitor;
 import devel.semantic_analysis.TypeCheckVisitor;
 import core.abstract_syntax.visitor.TypeVisitor;
 
@@ -24,4 +25,9 @@ public class VarDecl {
   public Type accept(TypeCheckVisitor v) {
 	  return v.visit(this);
   }
+  
+  public Stm accept(IRVisitor v) {
+	  return v.visit(this);
+  }
+  
 }

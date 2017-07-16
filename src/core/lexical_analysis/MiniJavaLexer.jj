@@ -191,7 +191,7 @@ FormalList FormalList():
 }
 {
 	(	  t = Type() id = Identifier() { fl.addElement(new Formal(t,id)); } (f = FormalRest() {fl.addElement(f);})*
-	)
+	)?
 	
 	{ return fl; }
 }
@@ -258,19 +258,54 @@ Exp Expression():
 	Identifier id;
 }
 {
-	( tok = <INTEGER_LITERAL> { exp = new IntegerLiteral(Integer.parseInt(tok.image)); }
+	( exp = Term()
 	| < TRUE > { exp = new True(); }
 	| < FALSE > { exp = new False(); }
-	| id = Identifier() { exp = new IdentifierExp(id.toString()); }
 	| < THIS > { exp = new This(); }
 	| < NEW > ( < INTEGER > < LSQPAREN > exp = Expression() < RSQPAREN > { exp = new NewArray(exp); }
 			  | id = Identifier() < LPAREN > < RPAREN > { exp = new NewObject(id); }
 			  )
 	| < NOT > exp = Expression() { exp = new Not(exp); }
-	| < LPAREN > exp = Expression() < RPAREN >
 	) expResult = Expression_(exp)
 
 	{ return expResult; }
+}
+
+Exp Term():
+{
+	Exp expResult, expLeft;
+}
+{
+	( expLeft = Factor() expResult = Term_(expLeft) )
+
+  	{ return expResult; }
+}
+
+Exp Factor():
+{
+	Token tok;
+	Identifier id;
+	Exp expResult;
+}
+{
+	( id = Identifier() { expResult = new IdentifierExp(id.toString()); }
+	| tok = <INTEGER_LITERAL> { expResult = new IntegerLiteral(Integer.parseInt(tok.image)); }
+	| < LPAREN > expResult = Expression() < RPAREN >
+	)
+
+	{ return expResult; }
+}
+
+Exp Term_(Exp expLeft):
+{
+	Exp expResult = expLeft, expRight = null, exp;
+}
+{
+  	(
+	 < TIMES > expRight = Factor() { exp = new Times(expLeft, expRight); } expResult = Term_(exp)
+  	)?
+
+  	{ return expResult; }
 }
 
 Exp Expression_(Exp expLeft):
@@ -281,10 +316,10 @@ Exp Expression_(Exp expLeft):
 }
 { ( LOOKAHEAD(2) ( ( < AND > 	expRight = Expression() { exp = new And(expLeft, expRight); }
 				   | < LT > 	expRight = Expression() { exp = new LessThan(expLeft, expRight); }
-				   | < PLUS > 	expRight = Expression() { exp = new Plus(expLeft, expRight); }
-				   | < MINUS > 	expRight = Expression() { exp = new Minus(expLeft, expRight); }
-				   | < TIMES > 	expRight = Expression() { exp = new Times(expLeft, expRight); }
-				   )			     | < LSQPAREN > expLeft = Expression() < RSQPAREN > { exp = expLeft; }
+				   | < PLUS > 	expRight = Term() 		{ exp = new Plus(expLeft, expRight); }
+				   | < MINUS > 	expRight = Term()		{ exp = new Minus(expLeft, expRight); }
+				   )
+			     | < LSQPAREN > expLeft = Expression() < RSQPAREN > { exp = expLeft; }
 			     | < DOT > ( < LENGTH > { exp = new ArrayLength(expLeft); }
 			     		   | id = Identifier() < LPAREN > expList = ExpList() < RPAREN > { exp = new Call(expLeft, id, expList); }
 			     		   )
@@ -301,7 +336,7 @@ ExpList ExpList():
 }
 {
 	(	  exp = Expression() {expl.addElement(exp);} ( exp = ExpRest() {expl.addElement(exp);} )*
-	)
+	)?
 	
 	{ return expl; }
 }
