@@ -24,7 +24,7 @@ public abstract class Instr {
     else return nthLabel(l.tail,i-1);
   }
 
-  public String format(TempMap m) {
+public String format(TempMap m) {
     TempList dst = def();
     TempList src = use();
     Targets j = jumps();

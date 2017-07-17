@@ -224,7 +224,7 @@ public class MipsFrame extends Frame {
 	return badSub;
     }
 
-    private static final
+    public static final
 	HashMap<Temp,String> tempMap = new HashMap<Temp,String>(32);
     static {
         tempMap.put(ZERO, "$0");

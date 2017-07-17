@@ -4,13 +4,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import core.abstract_syntax.syntaxtree.*;
 import core.activation_records.mips.MipsFrame;
-import core.activation_records.temp.Temp;
 import core.canonical_trees.BasicBlocks;
 import core.canonical_trees.Canon;
 import core.canonical_trees.TraceSchedule;
@@ -24,6 +22,7 @@ import devel.IR_translation.ProcFrag;
 import devel.IR_translation.TranslateVisitor;
 import devel.assemble_flow_graph.AssemFlowGraph;
 import devel.liveness_analysis.Liveness;
+import devel.reg_alloc.ColorMap;
 import devel.reg_alloc.RegAlloc;
 import devel.semantic_analysis.BuildTableVisitor;
 import devel.semantic_analysis.CheckTableVisitor;
@@ -58,7 +57,7 @@ public class Main {
 	public static void main(String [] args) {
 	   try {
 		   //Read a file with the program
-		   BufferedReader br = new BufferedReader(new FileReader(caseTests[7]));
+		   BufferedReader br = new BufferedReader(new FileReader(caseTests[0]));
 		   
 		   // Analysis lexical and parsing
 		   @SuppressWarnings("static-access")
@@ -145,7 +144,7 @@ public class Main {
 		   allInstrIt_.tail = null;
 		   
 		   
-		   //Print all of instructions' program
+		   // Print all of instructions' program
 //		   InstrList printInst = allInstr;
 //		   
 //		   while (printInst != null) {
@@ -156,7 +155,7 @@ public class Main {
 		   // Generate FlowGraph and InterferenceGraph
 		   AssemFlowGraph afg = new AssemFlowGraph(allInstr);
 		   
-//		   Printing flowGraph
+		   // Printing flowGraph
 //		   for(NodeList nl = afg.nodes(); nl!=null; nl=nl.tail){
 ////			   System.out.println(nl.head.getInstruction().assem);
 //			   for (NodeList p = nl.head.succ(); p!=null; p = p.tail) {
@@ -167,7 +166,7 @@ public class Main {
 		  
 		   Liveness ig = new Liveness(afg);
 		   
-//		   printing interferences
+		   // Printing interferences
 //		   for(String node: ig.getNodes()){
 //			   System.out.println(node + " - "+ ig.getInterferences(node));
 //		   }
@@ -175,6 +174,17 @@ public class Main {
 		   // Allocate registers to temps
 		   RegAlloc.instList = allInstr;
 		   HashMap<String, Integer> colors = RegAlloc.Alloc(ig);
+		   
+		   ColorMap mapping = new ColorMap(colors);
+		   
+		   //Print all of instructions' program with real registers
+		   System.out.println("\nCODE GENERATED:\n");
+		   InstrList printInst = allInstr;
+//		   
+		   while (printInst != null) {
+			   System.out.println(printInst.head.format(mapping));
+			   printInst = printInst.tail;
+		   }
 		   
 	   	} catch (ParseException e) {
 	   		System.out.println(e.toString());
