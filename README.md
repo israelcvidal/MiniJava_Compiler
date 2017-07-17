@@ -88,7 +88,7 @@
 # Como foi feito: #
 	Um novo padrão Visitor foi criado para implementar esta fase. Em cada construção da árvore sintática abstrata foi
 	criado um método para realizar a tradução, sendo que nem todas as construções da árvore sintática abstrata precisavam
-	realmente serem traduzidas e nas construções que envolviam métodos a classe Frame se fez necessária 
+	realmente ser traduzidas e, nas construções que envolviam métodos, a classe Frame se fez necessária 
 	(método procEntryExit1). Para esses casos, realizamos algumas modificações no MipsFrame para que os erros fossem 
 	consertados e pudéssemos utilizá-lo. Realizado as traduções necessárias, no final dessa etapa, tínhamos uma lista
 	de Fragmentos, sendo que cada Fragmento é composto do frame e a árvore IR correspondente a cada um dos métodos do
@@ -192,10 +192,10 @@
 
 # Como foi feito: #
 	Optamos por uma abordagem semelhante a do livro, utilizando pilhas para guardar os nós removidos do grafo. 
-	Iniciamos o código pré-colorindo os registradores com suas respectivas cores. Em seguida ficaremos manipulando uma cópia
-	o grafo de interferência (pois precisaremos do original para a etapa de coloração) até que sobrem apenas nós que representam
+	Iniciamos o código pré-colorindo os registradores com suas respectivas cores. Em seguida, sucessivamente manipulamos uma cópia
+	do grafo de interferência (pois precisaremos do original para a etapa de coloração) até que sobrem apenas nós que representam
 	registradores (em casos de aglutinação, nós que contenham registradores). Primeiramente, para cada nó, tentamos simplificá-lo.
-	Caso não seja possível, tentamos aglutiná-lo. Não havendo nenhuma dessas operações ocorrido, obteremos o nó move-related de
+	Caso não seja possível, tentamos aglutiná-lo. Não havendo nenhuma dessas operações ocorrido, buscaremos o nó move-related de
 	menor grau para aplicar freeze. Em último caso, quando não há um nó move-related, removemos como um transbordamento em
 	potencial o nó de maior grau. Uma vez terminada essa análise, desempilhamos os nós e escolhemos a menor cor disponível para 
 	ele. Em caso de transbordamento real, armazenamos os nós transbordantes em uma pilha e, no final, reescrevemos a lista de
